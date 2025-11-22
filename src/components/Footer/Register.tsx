@@ -15,7 +15,7 @@ import { toast } from 'react-hot-toast';
 import {useForm} from 'react-hook-form'
 
 export const Register = () => {
-  const url="http://localhost:3000/api/auth/register"
+  const url="https://clashaapi-4.onrender.com"
 
 
 

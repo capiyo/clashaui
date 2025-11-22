@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'https://clashaapi-4.onrender.com';
 
 interface Post {
   id: string;

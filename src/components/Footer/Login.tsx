@@ -16,7 +16,7 @@ import {useForm} from 'react-hook-form'
 
 export const Login = () => {
 
-  const url="http://localhost:3000/api/auth/login"
+  const url="https://clashaapi-4.onrender.com"
 
 
 

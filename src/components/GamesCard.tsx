@@ -75,7 +75,7 @@ const GamesCard = () => {
 
   async function fetchUsers(): Promise<GamesCardProps[]> {
     try {
-      const response = await fetch('http://localhost:3000/api/games');
+      const response = await fetch('https://clashaapi-4.onrender.com/api/games');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
