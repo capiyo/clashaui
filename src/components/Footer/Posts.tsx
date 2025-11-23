@@ -65,6 +65,37 @@ const Posts = () => {
     }
   };
 
+  const getFullImageUrl = (imageUrl: string): string => {
+    if (!imageUrl) return '';
+    
+    // If it's already a full URL, return as is
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    // If it starts with /, construct the full URL
+    if (imageUrl.startsWith('/')) {
+      return `${API_BASE_URL}${imageUrl}`;
+    }
+    
+    // For any other relative paths, ensure they have the base URL
+    return `${API_BASE_URL}/${imageUrl}`;
+  };
+
+  // Debug: Log image URLs
+  useEffect(() => {
+    if (posts.length > 0) {
+      console.log("Image URLs debug:");
+      posts.forEach(post => {
+        const fullUrl = getFullImageUrl(post.image_url);
+        console.log(`Post ${post.id}:`, {
+          original: post.image_url,
+          full: fullUrl
+        });
+      });
+    }
+  }, [posts]);
+
   const handleLike = (postId: string): void => {
     setLikedPosts(prev => {
       const newLiked = new Set(prev);
@@ -114,13 +145,6 @@ const Posts = () => {
       .slice(0, 2);
   };
 
-  const getFullImageUrl = (imageUrl: string): string => {
-    if (imageUrl.startsWith('http')) {
-      return imageUrl;
-    }
-    return `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-  };
-
   const useMockData = (): void => {
     const mockPosts: Post[] = [
       {
@@ -147,27 +171,27 @@ const Posts = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 py-4 overflow-y-auto">
-        <div className="max-w-md mx-auto px-4">
+      <div className="min-h-screen bg-white py-2">
+        <div className="w-full">
           {[...Array(2)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-md border border-cyan-200 mb-4 animate-pulse">
-              <div className="p-2 border-b border-cyan-100">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-cyan-200 rounded-full"></div>
-                  <div className="space-y-1">
-                    <div className="w-16 h-2 bg-cyan-200 rounded"></div>
-                    <div className="w-10 h-1 bg-cyan-100 rounded"></div>
+            <div key={i} className="bg-white border-b border-gray-200 mb-2 animate-pulse">
+              <div className="p-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                  <div className="space-y-1 flex-1">
+                    <div className="w-20 h-3 bg-gray-200 rounded"></div>
+                    <div className="w-16 h-2 bg-gray-100 rounded"></div>
                   </div>
                 </div>
               </div>
-              <div className="w-full h-[266px] bg-cyan-200"></div>
-              <div className="p-2 space-y-1">
-                <div className="flex gap-2">
-                  <div className="w-5 h-5 bg-cyan-200 rounded"></div>
-                  <div className="w-5 h-5 bg-cyan-200 rounded"></div>
-                  <div className="w-5 h-5 bg-cyan-200 rounded"></div>
+              <div className="w-full h-64 bg-gray-200"></div>
+              <div className="p-3 space-y-2">
+                <div className="flex gap-3">
+                  <div className="w-6 h-6 bg-gray-200 rounded"></div>
+                  <div className="w-6 h-6 bg-gray-200 rounded"></div>
+                  <div className="w-6 h-6 bg-gray-200 rounded"></div>
                 </div>
-                <div className="w-1/2 h-2 bg-cyan-200 rounded"></div>
+                <div className="w-3/4 h-3 bg-gray-200 rounded"></div>
               </div>
             </div>
           ))}
@@ -178,23 +202,23 @@ const Posts = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 flex items-center justify-center p-4">
-        <div className="text-center max-w-sm">
-          <div className="bg-white rounded-xl p-4 border border-cyan-200 shadow-md">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <div className="text-center w-full max-w-sm">
+          <div className="bg-white rounded-lg p-4 border border-cyan-200 shadow-md">
             <div className="text-cyan-600 mb-2 text-3xl">⚠️</div>
             <h3 className="text-cyan-800 font-semibold text-sm mb-1">Failed to load posts</h3>
             <p className="text-cyan-600 mb-2 text-xs">{error}</p>
             <div className="space-y-1">
               <button
                 onClick={fetchPosts}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded text-xs flex items-center justify-center gap-1"
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded text-sm flex items-center justify-center gap-1"
               >
-                <RefreshCw className="h-3 w-3" />
+                <RefreshCw className="h-4 w-4" />
                 Try Again
               </button>
               <button
                 onClick={useMockData}
-                className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-3 py-1 rounded border border-cyan-300 text-xs"
+                className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-3 py-2 rounded border border-cyan-300 text-sm"
               >
                 Use Demo Data
               </button>
@@ -206,53 +230,53 @@ const Posts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 py-4 overflow-y-auto">
-      <div className="max-w-md mx-auto px-4">
-        {/* Posts Grid */}
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              isLiked={likedPosts.has(post.id)}
-              isSaved={savedPosts.has(post.id)}
-              onLike={handleLike}
-              onSave={handleSave}
-              formatTimeAgo={formatTimeAgo}
-              getInitials={getInitials}
-              getFullImageUrl={getFullImageUrl}
-            />
-          ))}
-        </div>
+    <div className="min-h-screen bg-white">
+      {/* Posts Grid */}
+      <div className="w-full">
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            isLiked={likedPosts.has(post.id)}
+            isSaved={savedPosts.has(post.id)}
+            onLike={handleLike}
+            onSave={handleSave}
+            formatTimeAgo={formatTimeAgo}
+            getInitials={getInitials}
+            getFullImageUrl={getFullImageUrl}
+          />
+        ))}
+      </div>
 
-        {/* Empty State */}
-        {posts.length === 0 && (
-          <div className="text-center py-6 bg-white/80 backdrop-blur-sm rounded-xl border border-cyan-200 shadow-md">
-            <div className="text-cyan-400 mb-2 text-3xl">📷</div>
-            <h3 className="text-cyan-800 font-semibold text-sm mb-1">No posts yet</h3>
-            <p className="text-cyan-600 mb-3 text-xs">Be the first to share a moment!</p>
+      {/* Empty State */}
+      {posts.length === 0 && (
+        <div className="w-full p-6 bg-white border-b border-cyan-200">
+          <div className="text-center">
+            <div className="text-cyan-400 mb-3 text-4xl">📷</div>
+            <h3 className="text-cyan-800 font-semibold text-base mb-2">No posts yet</h3>
+            <p className="text-cyan-600 mb-4 text-sm">Be the first to share a moment!</p>
             <button
               onClick={useMockData}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded text-xs"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded text-sm"
             >
               Load Demo Posts
             </button>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Load More */}
-        {posts.length > 0 && (
-          <div className="text-center py-3">
-            <button
-              onClick={fetchPosts}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded flex items-center gap-1 mx-auto text-xs"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Load New Posts
-            </button>
-          </div>
-        )}
-      </div>
+      {/* Load More */}
+      {posts.length > 0 && (
+        <div className="w-full p-4 border-t border-gray-100">
+          <button
+            onClick={fetchPosts}
+            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 rounded flex items-center justify-center gap-2 text-sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Load New Posts
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -281,97 +305,132 @@ const PostCard: React.FC<PostCardProps> = ({
 }) => {
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [showFullCaption, setShowFullCaption] = useState<boolean>(false);
+  const [imageError, setImageError] = useState<boolean>(false);
+  const [hasValidImage, setHasValidImage] = useState<boolean>(false);
 
   const shouldTruncate = post.caption && post.caption.length > 80;
   const fullImageUrl = getFullImageUrl(post.image_url);
 
+  // Check if post has a valid image URL
+  useEffect(() => {
+    if (post.image_url && post.image_url.trim() !== '') {
+      setHasValidImage(true);
+    } else {
+      setHasValidImage(false);
+    }
+  }, [post.image_url]);
+
+  const handleImageError = () => {
+    console.error("Failed to load image:", fullImageUrl);
+    setImageError(true);
+    setImageLoaded(true);
+    setHasValidImage(false);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setHasValidImage(true);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md border border-cyan-200 overflow-hidden hover:shadow-cyan-200/20 transition-all duration-300">
-      {/* Header - Minimal height */}
-      <div className="p-2 border-b border-cyan-100">
+    <div className="bg-white border-b border-gray-200 last:border-b-0">
+      {/* Header */}
+      <div className="p-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Avatar className="w-6 h-6 border border-cyan-300">
-              <AvatarFallback className="bg-cyan-500 text-white font-semibold text-xs">
+          <div className="flex items-center gap-3">
+            <Avatar className="w-8 h-8 border border-cyan-300">
+              <AvatarFallback className="bg-cyan-500 text-white font-semibold text-sm">
                 {getInitials(post.user_name)}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <h3 className="font-semibold text-cyan-800 text-xs">{post.user_name}</h3>
-              <div className="flex items-center gap-1 text-cyan-600 text-xs">
-                <Clock className="h-2 w-2" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-800 text-sm">{post.user_name}</h3>
+              <div className="flex items-center gap-1 text-gray-500 text-xs">
+                <Clock className="h-3 w-3" />
                 <span>{formatTimeAgo(post.created_at)}</span>
               </div>
             </div>
           </div>
-          <button className="text-cyan-500 hover:text-cyan-700 p-0.5 rounded-full transition-colors">
-            <MoreHorizontal className="h-3 w-3" />
+          <button className="text-gray-500 hover:text-cyan-600 p-1 rounded-full transition-colors">
+            <MoreHorizontal className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      {/* Image - Increased height by 10px */}
-      <div className="relative bg-cyan-50">
-        {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-6 h-6 border-2 border-cyan-200 border-t-cyan-500 rounded-full animate-spin"></div>
-          </div>
-        )}
-        <img
-          src={fullImageUrl}
-          alt={post.caption || `Post by ${post.user_name}`}
-          className={`w-full h-[350px] object-cover transition-opacity duration-300 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          onLoad={() => setImageLoaded(true)}
-          onError={(e) => {
-            console.error("Failed to load image:", fullImageUrl);
-            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNEOEU5RkYiLz48cGF0aCBkPSJNMTIwIDEyMEgxODBWMTgwSDEyMFYxMjBaIiBmaWxsPSIjQTdDQkZGIi8+PHBhdGggZD0iTTIyMCAxMjBIMjgwVjE4MEgyMjBWMTIwWiIgZmlsbD0iI0E3Q0JGRiIvPjxwYXRoIGQ9Ik0xMjAgMjAwSDE4MFYyNjBIMTIwVjIwMFoiIGZpbGw9IiNBN0NCRkYiLz48cGF0aCBkPSJNMjIwIDIwMEgyODBWMjYwSDIyMFYyMDBaIiBmaWxsPSIjQTdDQkZGIi8+PC9zdmc+';
-          }}
-        />
-      </div>
+      {/* Image Section - Only show if there's a valid image */}
+      {hasValidImage && (
+        <div className="relative bg-gray-50 w-full">
+          {!imageLoaded && !imageError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <div className="w-8 h-8 border-2 border-gray-300 border-t-cyan-500 rounded-full animate-spin"></div>
+            </div>
+          )}
+          {imageError ? (
+            <div className="w-full aspect-square flex items-center justify-center bg-gray-100">
+              <div className="text-center text-gray-500">
+                <div className="text-3xl mb-2">📷</div>
+                <p className="text-sm">Image not available</p>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={fullImageUrl}
+              alt={post.caption || `Post by ${post.user_name}`}
+              className={`w-full object-cover transition-opacity duration-300 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{ 
+                maxHeight: '70vh',
+                minHeight: '200px'
+              }}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          )}
+        </div>
+      )}
 
-      {/* Footer - Reduced height significantly */}
-      <div className="p-2">
-        {/* Actions - Compact */}
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
+      {/* Footer */}
+      <div className={`p-3 ${!hasValidImage ? 'pt-0' : ''}`}>
+        {/* Actions */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => onLike(post.id)}
-              className={`p-0.5 transition-all duration-200 ${
-                isLiked ? 'text-red-500 scale-105' : 'text-cyan-600 hover:text-red-500'
+              className={`p-1 transition-all duration-200 ${
+                isLiked ? 'text-red-500 scale-110' : 'text-gray-600 hover:text-red-500'
               }`}
             >
-              <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
+              <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
             </button>
-            <button className="text-cyan-600 hover:text-cyan-700 p-0.5 transition-colors">
-              <MessageCircle className="h-4 w-4" />
+            <button className="text-gray-600 hover:text-cyan-600 p-1 transition-colors">
+              <MessageCircle className="h-5 w-5" />
             </button>
-            <button className="text-cyan-600 hover:text-cyan-700 p-0.5 transition-colors">
-              <Share className="h-4 w-4" />
+            <button className="text-gray-600 hover:text-cyan-600 p-1 transition-colors">
+              <Share className="h-5 w-5" />
             </button>
           </div>
           <button
             onClick={() => onSave(post.id)}
-            className={`p-0.5 transition-all duration-200 ${
-              isSaved ? 'text-cyan-600 scale-105' : 'text-cyan-600 hover:text-cyan-700'
+            className={`p-1 transition-all duration-200 ${
+              isSaved ? 'text-cyan-600 scale-110' : 'text-gray-600 hover:text-cyan-600'
             }`}
           >
-            <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+            <Bookmark className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
           </button>
         </div>
 
-        {/* Likes - Minimal */}
-        <div className="mb-1">
-          <p className="font-semibold text-cyan-800 text-xs">
+        {/* Likes */}
+        <div className="mb-2">
+          <p className="font-semibold text-gray-800 text-sm">
             {Math.floor(Math.random() * 50)} likes
           </p>
         </div>
 
-        {/* Caption - Compact */}
+        {/* Caption */}
         {post.caption && (
-          <div className="mb-1">
-            <p className="text-cyan-800 text-xs">
+          <div className="mb-2">
+            <p className="text-gray-800 text-sm">
               <span className="font-semibold">{post.user_name}</span>{' '}
               {shouldTruncate && !showFullCaption 
                 ? `${post.caption.slice(0, 80)}...`
@@ -380,7 +439,7 @@ const PostCard: React.FC<PostCardProps> = ({
               {shouldTruncate && (
                 <button
                   onClick={() => setShowFullCaption(!showFullCaption)}
-                  className="ml-1 text-cyan-600 hover:text-cyan-700 font-medium text-xs"
+                  className="ml-1 text-cyan-600 hover:text-cyan-700 font-medium text-sm"
                 >
                   {showFullCaption ? 'Less' : 'More'}
                 </button>
@@ -389,22 +448,22 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         )}
 
-        {/* Comments - Minimal */}
-        <div className="text-cyan-600 text-xs mb-1">
-          <button className="hover:text-cyan-700 transition-colors">
+        {/* Comments */}
+        <div className="text-gray-600 text-sm mb-2">
+          <button className="hover:text-cyan-600 transition-colors">
             View {Math.floor(Math.random() * 15)} comments
           </button>
         </div>
 
-        {/* Add Comment - Minimal */}
-        <div className="pt-1 border-t border-cyan-100">
-          <div className="flex gap-1">
+        {/* Add Comment */}
+        <div className="pt-2 border-t border-gray-100">
+          <div className="flex gap-2">
             <input
               type="text"
               placeholder="Add comment..."
-              className="flex-1 text-xs text-cyan-800 bg-transparent border-none outline-none placeholder-cyan-400"
+              className="flex-1 text-sm text-gray-800 bg-transparent border-none outline-none placeholder-gray-400"
             />
-            <button className="text-cyan-500 hover:text-cyan-700 font-semibold text-xs transition-colors">
+            <button className="text-cyan-600 hover:text-cyan-700 font-semibold text-sm transition-colors">
               Post
             </button>
           </div>
