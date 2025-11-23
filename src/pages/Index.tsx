@@ -59,13 +59,24 @@ const Index = () => {
  <div className="flex-col  ">
       <div className="sm:hidden md:block"><Header />      </div>
      <div><HeroSection/></div>
-      <div className="flex flex-row w-screen ">   
-         <div className="hidden md:flex  lg:w-[700px]"><Posts/></div> 
-     <div className="hidden md:flex   overflow-auto"><GamesCard/>
-     </div>
-     
-     </div>
-     
+      <div className="flex flex-row min-h-screen w-full">
+  {/* Left Column - Posts */}
+  <div className="hidden md:flex flex-1 max-w-[600px]">
+    <Posts/>
+  </div>
+  
+  {/* Right Column - GamesCard */}
+  
+   <div className="hidden md:flex  max-w-[900px] overflow-auto">
+    <GamesCard/>
+  </div>
+  {/* Mobile View - Show only one component at a time */}
+  <div className="md:hidden w-full">
+    {/* You can add a toggle or tabs here for mobile */}
+    <Posts/>
+    {/* Or <GamesCard/> depending on your mobile navigation */}
+  </div>
+</div>
      
       </div>
       </div>

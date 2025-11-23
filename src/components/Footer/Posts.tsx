@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -26,6 +26,7 @@ const Posts = () => {
   const [error, setError] = useState<string>("");
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set());
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchPosts();
@@ -68,21 +69,17 @@ const Posts = () => {
   const getFullImageUrl = (imageUrl: string): string => {
     if (!imageUrl) return '';
     
-    // If it's already a full URL, return as is
     if (imageUrl.startsWith('http')) {
       return imageUrl;
     }
     
-    // If it starts with /, construct the full URL
     if (imageUrl.startsWith('/')) {
       return `${API_BASE_URL}${imageUrl}`;
     }
     
-    // For any other relative paths, ensure they have the base URL
     return `${API_BASE_URL}/${imageUrl}`;
   };
 
-  // Debug: Log image URLs
   useEffect(() => {
     if (posts.length > 0) {
       console.log("Image URLs debug:");
@@ -163,6 +160,22 @@ const Posts = () => {
         user_id: 'user456',
         created_at: Math.floor(Date.now() / 1000) - 5 * 60 * 60,
       },
+      {
+        id: '3',
+        image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop',
+        caption: 'Fashion week vibes! 👗✨ #fashion #style #ootd',
+        user_name: 'Emma Wilson',
+        user_id: 'user789',
+        created_at: Math.floor(Date.now() / 1000) - 8 * 60 * 60,
+      },
+      {
+        id: '4',
+        image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop',
+        caption: 'Healthy breakfast to start the day right! 🥑🍳 #healthy #food #breakfast',
+        user_name: 'Mike Johnson',
+        user_id: 'user101',
+        created_at: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+      },
     ];
     setPosts(mockPosts);
     setError("");
@@ -171,30 +184,33 @@ const Posts = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white py-2">
-        <div className="w-full">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="bg-white border-b border-gray-200 mb-2 animate-pulse">
-              <div className="p-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                  <div className="space-y-1 flex-1">
-                    <div className="w-20 h-3 bg-gray-200 rounded"></div>
-                    <div className="w-16 h-2 bg-gray-100 rounded"></div>
+      <div className="h-screen bg-white overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          <div className="max-w-2xl mx-auto">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white border-b border-gray-200 animate-pulse">
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                    <div className="space-y-1 flex-1">
+                      <div className="w-24 h-4 bg-gray-200 rounded"></div>
+                      <div className="w-20 h-3 bg-gray-100 rounded"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="w-full h-64 bg-gray-200"></div>
-              <div className="p-3 space-y-2">
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 bg-gray-200 rounded"></div>
-                  <div className="w-6 h-6 bg-gray-200 rounded"></div>
-                  <div className="w-6 h-6 bg-gray-200 rounded"></div>
+                <div className="w-full h-96 bg-gray-200"></div>
+                <div className="p-4 space-y-3">
+                  <div className="flex gap-4">
+                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
+                  <div className="w-1/2 h-3 bg-gray-200 rounded"></div>
                 </div>
-                <div className="w-3/4 h-3 bg-gray-200 rounded"></div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -202,23 +218,23 @@ const Posts = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="text-center w-full max-w-sm">
-          <div className="bg-white rounded-lg p-4 border border-cyan-200 shadow-md">
-            <div className="text-cyan-600 mb-2 text-3xl">⚠️</div>
-            <h3 className="text-cyan-800 font-semibold text-sm mb-1">Failed to load posts</h3>
-            <p className="text-cyan-600 mb-2 text-xs">{error}</p>
-            <div className="space-y-1">
+      <div className="h-screen bg-white flex items-center justify-center p-4">
+        <div className="text-center max-w-sm">
+          <div className="bg-white rounded-lg p-6 border border-cyan-200 shadow-md">
+            <div className="text-cyan-600 mb-3 text-4xl">⚠️</div>
+            <h3 className="text-cyan-800 font-semibold text-lg mb-2">Failed to load posts</h3>
+            <p className="text-cyan-600 mb-4 text-sm">{error}</p>
+            <div className="space-y-2">
               <button
                 onClick={fetchPosts}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded text-sm flex items-center justify-center gap-1"
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-3 rounded-lg text-sm flex items-center justify-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
                 Try Again
               </button>
               <button
                 onClick={useMockData}
-                className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-3 py-2 rounded border border-cyan-300 text-sm"
+                className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-4 py-3 rounded-lg border border-cyan-300 text-sm"
               >
                 Use Demo Data
               </button>
@@ -230,58 +246,67 @@ const Posts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Posts Grid */}
-      <div className="w-full">
-        {posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            isLiked={likedPosts.has(post.id)}
-            isSaved={savedPosts.has(post.id)}
-            onLike={handleLike}
-            onSave={handleSave}
-            formatTimeAgo={formatTimeAgo}
-            getInitials={getInitials}
-            getFullImageUrl={getFullImageUrl}
-          />
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {posts.length === 0 && (
-        <div className="w-full p-6 bg-white border-b border-cyan-200">
-          <div className="text-center">
-            <div className="text-cyan-400 mb-3 text-4xl">📷</div>
-            <h3 className="text-cyan-800 font-semibold text-base mb-2">No posts yet</h3>
-            <p className="text-cyan-600 mb-4 text-sm">Be the first to share a moment!</p>
-            <button
-              onClick={useMockData}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded text-sm"
-            >
-              Load Demo Posts
-            </button>
+    <div className="h-screen bg-white overflow-hidden">
+      {/* Scrollable container */}
+      <div 
+        ref={containerRef}
+        className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-200 scrollbar-track-gray-100"
+      >
+        {/* Centered content for large screens */}
+        <div className="max-w-2xl mx-auto">
+          {/* Posts Grid */}
+          <div className="w-full">
+            {posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                isLiked={likedPosts.has(post.id)}
+                isSaved={savedPosts.has(post.id)}
+                onLike={handleLike}
+                onSave={handleSave}
+                formatTimeAgo={formatTimeAgo}
+                getInitials={getInitials}
+                getFullImageUrl={getFullImageUrl}
+              />
+            ))}
           </div>
-        </div>
-      )}
 
-      {/* Load More */}
-      {posts.length > 0 && (
-        <div className="w-full p-4 border-t border-gray-100">
-          <button
-            onClick={fetchPosts}
-            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 rounded flex items-center justify-center gap-2 text-sm"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Load New Posts
-          </button>
+          {/* Empty State */}
+          {posts.length === 0 && (
+            <div className="w-full p-8 bg-white border-b border-cyan-200">
+              <div className="text-center">
+                <div className="text-cyan-400 mb-4 text-5xl">📷</div>
+                <h3 className="text-cyan-800 font-semibold text-xl mb-3">No posts yet</h3>
+                <p className="text-cyan-600 mb-6 text-base">Be the first to share a moment!</p>
+                <button
+                  onClick={useMockData}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg text-base font-semibold"
+                >
+                  Load Demo Posts
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Load More */}
+          {posts.length > 0 && (
+            <div className="w-full p-6 border-t border-gray-100 bg-white sticky bottom-0">
+              <button
+                onClick={fetchPosts}
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-4 rounded-lg flex items-center justify-center gap-3 text-base font-semibold shadow-lg"
+              >
+                <RefreshCw className="h-5 w-5" />
+                Load New Posts
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-// Post Card Component
+// Post Card Component (keep your existing PostCard component exactly as is)
 interface PostCardProps {
   post: Post;
   isLiked: boolean;
@@ -311,7 +336,6 @@ const PostCard: React.FC<PostCardProps> = ({
   const shouldTruncate = post.caption && post.caption.length > 80;
   const fullImageUrl = getFullImageUrl(post.image_url);
 
-  // Check if post has a valid image URL
   useEffect(() => {
     if (post.image_url && post.image_url.trim() !== '') {
       setHasValidImage(true);
@@ -333,43 +357,43 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 last:border-b-0">
+    <div className="bg-white border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors duration-200">
       {/* Header */}
-      <div className="p-3">
+      <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="w-8 h-8 border border-cyan-300">
+            <Avatar className="w-10 h-10 border border-cyan-300 shadow-sm">
               <AvatarFallback className="bg-cyan-500 text-white font-semibold text-sm">
                 {getInitials(post.user_name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-800 text-sm">{post.user_name}</h3>
-              <div className="flex items-center gap-1 text-gray-500 text-xs">
+              <h3 className="font-semibold text-gray-800 text-base">{post.user_name}</h3>
+              <div className="flex items-center gap-1 text-gray-500 text-sm">
                 <Clock className="h-3 w-3" />
                 <span>{formatTimeAgo(post.created_at)}</span>
               </div>
             </div>
           </div>
-          <button className="text-gray-500 hover:text-cyan-600 p-1 rounded-full transition-colors">
+          <button className="text-gray-500 hover:text-cyan-600 p-2 rounded-full transition-colors">
             <MoreHorizontal className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      {/* Image Section - Only show if there's a valid image */}
+      {/* Image Section */}
       {hasValidImage && (
         <div className="relative bg-gray-50 w-full">
           {!imageLoaded && !imageError && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-              <div className="w-8 h-8 border-2 border-gray-300 border-t-cyan-500 rounded-full animate-spin"></div>
+              <div className="w-10 h-10 border-2 border-gray-300 border-t-cyan-500 rounded-full animate-spin"></div>
             </div>
           )}
           {imageError ? (
             <div className="w-full aspect-square flex items-center justify-center bg-gray-100">
               <div className="text-center text-gray-500">
-                <div className="text-3xl mb-2">📷</div>
-                <p className="text-sm">Image not available</p>
+                <div className="text-4xl mb-3">📷</div>
+                <p className="text-base">Image not available</p>
               </div>
             </div>
           ) : (
@@ -381,7 +405,7 @@ const PostCard: React.FC<PostCardProps> = ({
               }`}
               style={{ 
                 maxHeight: '70vh',
-                minHeight: '200px'
+                minHeight: '300px'
               }}
               onLoad={handleImageLoad}
               onError={handleImageError}
@@ -391,46 +415,46 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Footer */}
-      <div className={`p-3 ${!hasValidImage ? 'pt-0' : ''}`}>
+      <div className={`p-4 ${!hasValidImage ? 'pt-0' : ''}`}>
         {/* Actions */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => onLike(post.id)}
-              className={`p-1 transition-all duration-200 ${
+              className={`p-2 transition-all duration-200 ${
                 isLiked ? 'text-red-500 scale-110' : 'text-gray-600 hover:text-red-500'
               }`}
             >
-              <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
+              <Heart className={`h-6 w-6 ${isLiked ? 'fill-current' : ''}`} />
             </button>
-            <button className="text-gray-600 hover:text-cyan-600 p-1 transition-colors">
-              <MessageCircle className="h-5 w-5" />
+            <button className="text-gray-600 hover:text-cyan-600 p-2 transition-colors">
+              <MessageCircle className="h-6 w-6" />
             </button>
-            <button className="text-gray-600 hover:text-cyan-600 p-1 transition-colors">
-              <Share className="h-5 w-5" />
+            <button className="text-gray-600 hover:text-cyan-600 p-2 transition-colors">
+              <Share className="h-6 w-6" />
             </button>
           </div>
           <button
             onClick={() => onSave(post.id)}
-            className={`p-1 transition-all duration-200 ${
+            className={`p-2 transition-all duration-200 ${
               isSaved ? 'text-cyan-600 scale-110' : 'text-gray-600 hover:text-cyan-600'
             }`}
           >
-            <Bookmark className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
+            <Bookmark className={`h-6 w-6 ${isSaved ? 'fill-current' : ''}`} />
           </button>
         </div>
 
         {/* Likes */}
-        <div className="mb-2">
-          <p className="font-semibold text-gray-800 text-sm">
+        <div className="mb-3">
+          <p className="font-semibold text-gray-800 text-base">
             {Math.floor(Math.random() * 50)} likes
           </p>
         </div>
 
         {/* Caption */}
         {post.caption && (
-          <div className="mb-2">
-            <p className="text-gray-800 text-sm">
+          <div className="mb-3">
+            <p className="text-gray-800 text-base">
               <span className="font-semibold">{post.user_name}</span>{' '}
               {shouldTruncate && !showFullCaption 
                 ? `${post.caption.slice(0, 80)}...`
@@ -439,9 +463,9 @@ const PostCard: React.FC<PostCardProps> = ({
               {shouldTruncate && (
                 <button
                   onClick={() => setShowFullCaption(!showFullCaption)}
-                  className="ml-1 text-cyan-600 hover:text-cyan-700 font-medium text-sm"
+                  className="ml-2 text-cyan-600 hover:text-cyan-700 font-medium text-base"
                 >
-                  {showFullCaption ? 'Less' : 'More'}
+                  {showFullCaption ? 'Show less' : 'Show more'}
                 </button>
               )}
             </p>
@@ -449,21 +473,21 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {/* Comments */}
-        <div className="text-gray-600 text-sm mb-2">
+        <div className="text-gray-600 text-base mb-3">
           <button className="hover:text-cyan-600 transition-colors">
             View {Math.floor(Math.random() * 15)} comments
           </button>
         </div>
 
         {/* Add Comment */}
-        <div className="pt-2 border-t border-gray-100">
-          <div className="flex gap-2">
+        <div className="pt-3 border-t border-gray-100">
+          <div className="flex gap-3">
             <input
               type="text"
               placeholder="Add comment..."
-              className="flex-1 text-sm text-gray-800 bg-transparent border-none outline-none placeholder-gray-400"
+              className="flex-1 text-base text-gray-800 bg-transparent border-none outline-none placeholder-gray-400"
             />
-            <button className="text-cyan-600 hover:text-cyan-700 font-semibold text-sm transition-colors">
+            <button className="text-cyan-600 hover:text-cyan-700 font-semibold text-base transition-colors">
               Post
             </button>
           </div>
