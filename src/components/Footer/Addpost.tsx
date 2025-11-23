@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { Image as ImageIcon, Send, X } from "lucide-react";
 
-const API_BASE_URL = 'https://clashaapi-4.onrender.com';
+const API_BASE_URL = 'https://clashaapi.onrender.com';
+
 
 const AddPost = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
