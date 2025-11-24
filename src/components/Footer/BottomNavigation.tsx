@@ -4,7 +4,6 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Posts from "./Posts";
 import GamesCard from "../GamesCard";
 
-
 type TabType = "posts" | "games" | "live";
 
 interface TabConfig {
@@ -62,7 +61,7 @@ export const BottomNavigation = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 overflow-hidden p-6">
+      <div className="flex-1 overflow-hidden pb-16"> {/* Added padding-bottom to prevent content from being hidden behind absolute nav */}
         <div className="max-w-4xl mx-auto h-full">
           {/* Main Content Area with Sliding Effect */}
           <div 
@@ -76,37 +75,34 @@ export const BottomNavigation = () => {
               style={{ transform: `translateX(${getContentOffset()})` }}
             >
               {/* Posts Section */}
-              <div className="w-full flex-shrink-0 space-y-4 overflow-y-auto h-full px-2">
+              <div className="w-full flex-shrink-0 overflow-y-auto h-full">
                 <Posts/>
-                
               </div>
 
               {/* Games Section */}
-              <div className="w-full flex-shrink-0 space-y-4 overflow-y-auto h-full px-2">
-              
-                  <GamesCard/>
+              <div className="w-full flex-shrink-0 overflow-y-auto h-full">
+                <GamesCard/>
               </div>
 
               {/* Live Section */}
-              <div className="w-full flex-shrink-0 space-y-4 overflow-y-auto h-full px-2">
+              <div className="w-full flex-shrink-0 overflow-y-auto h-full">
                 <GamesCard/>
-               </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Navigation Toggle */}
-      <nav className="bg-nav-bg border-t border-border/50 backdrop-blur-sm sticky bottom-0">
-        <div className="max-w-4xl mx-auto px-4 py-3">
+      {/* Bottom Navigation Toggle - Now Absolute */}
+      <nav className="absolute bottom-0 left-0 right-0 bg-nav-bg border-t border-border/50 backdrop-blur-sm z-[999]">
+        <div className="max-w-4xl mx-auto">
           <div className="relative inline-flex bg-muted/50 p-1 rounded-full w-full max-w-md mx-auto">
-            {/* Sliding Indicator with Cyan Glow */}
+            {/* Sliding Indicator with Light Cyan Background */}
             <div
-              className="absolute top-1 bottom-1 bg-gradient-to-r from-cyan via-cyan-light to-cyan rounded-full shadow-lg transition-all duration-300 ease-out"
+              className="absolute top-1 bottom-1 bg-cyan-200 rounded-full transition-all duration-300 ease-out"
               style={{
                 width: `calc(${100 / tabs.length}% - 0.5rem)`,
                 left: `calc(${getIndicatorPosition()} + 0.25rem)`,
-                boxShadow: "0 0 20px hsl(var(--cyan-glow) / 0.5), 0 0 40px hsl(var(--cyan-glow) / 0.3)",
               }}
             />
             

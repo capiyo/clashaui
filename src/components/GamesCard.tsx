@@ -91,41 +91,40 @@ const GamesCard = () => {
     <div className="min-h-screen bg-white p-4">
       {/* Enhanced Stats Bar */}
       <div className="grid grid-cols-3 gap-3 mb-6 w-full max-w-6xl mx-auto">
-        <div className="bg-white border border-cyan-200/60 rounded-xl p-4 hover:border-cyan-300 transition-all duration-300 group">
+        <div className="bg-white border border-gray-200 rounded-lg p-3 transition-all duration-300 group">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shadow">
-                <TrendingUp className="w-6 h-6 text-cyan-600" />
+              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-gray-600" />
               </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div>
-              <p className="text-gray-500 text-xs font-semibold">live games</p>
-              <p className="text-cyan-600 text-xl font-black">{games.length}</p>
+              <p className="text-gray-500 text-xs">live games</p>
+              <p className="text-gray-700 text-lg">{games.length}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white border border-cyan-200/60 rounded-xl p-4 hover:border-cyan-300 transition-all duration-300 group">
+        <div className="bg-white border border-gray-200 rounded-lg p-3 transition-all duration-300 group">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center shadow">
-              <Zap className="w-6 h-6 text-orange-600" />
+            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-gray-600" />
             </div>
             <div>
-              <p className="text-gray-500 text-xs font-semibold">active now</p>
-              <p className="text-orange-600 text-xl font-black">24/7</p>
+              <p className="text-gray-500 text-xs">active now</p>
+              <p className="text-gray-700 text-lg">24/7</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white border border-cyan-200/60 rounded-xl p-4 hover:border-cyan-300 transition-all duration-300 group">
+        <div className="bg-white border border-gray-200 rounded-lg p-3 transition-all duration-300 group">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center shadow">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+              <Users className="w-5 h-5 text-gray-600" />
             </div>
             <div>
-              <p className="text-gray-500 text-xs font-semibold">players</p>
-              <p className="text-purple-600 text-xl font-black">1.2K</p>
+              <p className="text-gray-500 text-xs">players</p>
+              <p className="text-gray-700 text-lg">1.2K</p>
             </div>
           </div>
         </div>
@@ -144,9 +143,9 @@ const GamesCard = () => {
       {games.length === 0 && (
         <div className="w-full max-w-6xl mx-auto text-center py-16">
           <div className="relative inline-block mb-4">
-            <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+            <div className="w-16 h-16 border-4 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
           </div>
-          <p className="text-gray-500 text-base font-semibold">Loading epic clashes...</p>
+          <p className="text-gray-500 text-base">Loading epic clashes...</p>
         </div>
       )}
     </div>
@@ -178,7 +177,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
     toast({
       title: "🎉 BET PLACED! 🎉",
       description: `₿${amount} on ${selectedOption === "homeTeam" ? homeTeam : awayTeam}`,
-      className: "bg-gradient-to-r from-green-500 to-cyan-500 text-white"
+      className: "bg-green-500 text-white"
     });
     setIsPledging(false);
   };
@@ -223,148 +222,147 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
         "relative transition-all duration-300",
         isHovered ? "scale-[1.02]" : "scale-100"
       )}>
-        {/* Main Card - Fixed 500px width */}
-        <Card className="relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 w-[500px] min-h-[450px] h-auto">
-          {/* Header Line */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-t-xl"></div>
+        {/* Main Card - Fixed 500px width with reduced height - Top cyan line removed */}
+        <Card className="relative bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 w-[500px] min-h-[380px] h-auto">
+          {/* Header Line - REMOVED */}
           
-          <CardHeader className="pb-3 pt-5 px-6">
-            <div className="flex items-center justify-between mb-3">
-              <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 text-sm px-4 py-1.5 rounded-full font-bold flex items-center gap-2">
-                <Crown className="w-4 h-4" />
+          <CardHeader className="pb-2 pt-4 px-5">
+            <div className="flex items-center justify-between mb-2">
+              <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                <Crown className="w-3 h-3" />
                 {games.league.split(' ')[0].toLowerCase()}
               </Badge>
-              <div className="flex items-center gap-2 text-gray-600 text-sm">
-                <Calendar className="w-4 h-4 text-cyan-600" />
-                <span className="font-semibold">{formatDate(games.date)}</span>
+              <div className="flex items-center gap-1 text-gray-600 text-xs">
+                <Calendar className="w-3 h-3 text-cyan-600" />
+                <span>{formatDate(games.date)}</span>
               </div>
             </div>
 
             {/* Teams Section with Avatars */}
             <div className="text-center">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <div className="text-center flex-1">
-                  <Avatar className="w-16 h-16 border-2 border-cyan-300 mx-auto mb-3 group-hover:border-cyan-400 transition-all duration-300">
+                  <Avatar className="w-14 h-14 border-2 border-cyan-300 mx-auto mb-2 group-hover:border-cyan-400 transition-all duration-300">
                     <AvatarImage src={getTeamAvatar(games.home_team)} />
-                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-lg">
+                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm">
                       {games.home_team.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <p className="font-bold text-gray-800 text-base truncate leading-tight">{games.home_team}</p>
-                  <p className="text-cyan-600 text-xl font-black mt-2">{games.home_win}</p>
+                  <p className="text-gray-800 text-sm truncate leading-tight">{games.home_team}</p>
+                  <p className="text-cyan-600 text-lg mt-1">{games.home_win}</p>
                 </div>
 
-                <div className="flex flex-col items-center mx-4">
+                <div className="flex flex-col items-center mx-3">
                   {/* VS Button */}
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg">
-                    <span className="text-white text-sm font-black">VS</span>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center shadow">
+                    <span className="text-white text-xs">VS</span>
                   </div>
                 </div>
 
                 <div className="text-center flex-1">
-                  <Avatar className="w-16 h-16 border-2 border-cyan-300 mx-auto mb-3 group-hover:border-cyan-400 transition-all duration-300">
+                  <Avatar className="w-14 h-14 border-2 border-cyan-300 mx-auto mb-2 group-hover:border-cyan-400 transition-all duration-300">
                     <AvatarImage src={getTeamAvatar(games.away_team)} />
-                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg">
+                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm">
                       {games.away_team.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <p className="font-bold text-gray-800 text-base truncate leading-tight">{games.away_team}</p>
-                  <p className="text-cyan-600 text-xl font-black mt-2">{games.away_win}</p>
+                  <p className="text-gray-800 text-sm truncate leading-tight">{games.away_team}</p>
+                  <p className="text-cyan-600 text-lg mt-1">{games.away_win}</p>
                 </div>
               </div>
 
               {/* Draw Odds */}
-              <div className="pt-3 border-t border-cyan-200/50">
-                <p className="text-gray-600 text-sm mb-2 font-semibold">draw odds</p>
-                <p className="text-cyan-700 text-lg font-black bg-cyan-500/10 py-2 rounded-lg">{games.draw}</p>
+              <div className="pt-2 border-t border-gray-200">
+                <p className="text-gray-600 text-xs mb-1">draw odds</p>
+                <p className="text-cyan-700 text-sm bg-cyan-500/10 py-1 rounded">{games.draw}</p>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 pb-5 px-6">
+          <CardContent className="space-y-3 pb-4 px-5">
             {/* Recent Bettors */}
             <div className="flex justify-between items-center">
-              <div className="flex -space-x-3">
+              <div className="flex -space-x-2">
                 {mockUsers.slice(0, 3).map((user, index) => (
-                  <Avatar key={index} className="w-10 h-10 border-2 border-white shadow-md">
+                  <Avatar key={index} className="w-8 h-8 border-2 border-white shadow">
                     <AvatarImage src={user.avatar} />
-                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm">
+                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs">
                       {user.name[0]}
                     </AvatarFallback>
                   </Avatar>
                 ))}
               </div>
-              <span className="text-sm text-gray-500 font-semibold">
+              <span className="text-xs text-gray-500">
                 +{mockUsers.length} placed bets
               </span>
             </div>
 
             {/* Social Interaction Buttons */}
-            <div className="flex justify-center gap-4 pt-2">
+            <div className="flex justify-center gap-3 pt-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLike}
-                className={`flex items-center space-x-2 transition-all duration-300 h-9 px-3 rounded-xl ${
+                className={`flex items-center space-x-1 transition-all duration-300 h-8 px-2 rounded-lg ${
                   isLiked 
-                    ? "bg-gradient-to-r from-pink-500/20 to-red-500/20 text-pink-600 border border-pink-300/60 shadow-lg" 
-                    : "bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 hover:text-cyan-700 border border-cyan-200/50 hover:shadow-md"
+                    ? "bg-pink-500/10 text-pink-600 border border-pink-300" 
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border border-gray-200"
                 }`}
               >
                 <Heart 
-                  className={`h-5 w-5 transition-all duration-300 ${
+                  className={`h-4 w-4 transition-all duration-300 ${
                     isLiked ? "fill-pink-500 text-pink-500" : ""
                   }`} 
                 />
-                <span className="text-sm font-bold">{likeCount}</span>
+                <span className="text-xs">{likeCount}</span>
               </Button>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleComment}
-                className="flex items-center space-x-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 hover:text-cyan-700 border border-cyan-200/50 transition-all duration-300 h-9 px-3 rounded-xl hover:shadow-md"
+                className="flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border border-gray-200 transition-all duration-300 h-8 px-2 rounded-lg"
               >
-                <MessageSquare className="h-5 w-5" />
-                <span className="text-sm font-bold">{commentCount}</span>
+                <MessageSquare className="h-4 w-4" />
+                <span className="text-xs">{commentCount}</span>
               </Button>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleFollow}
-                className={`flex items-center space-x-2 transition-all duration-300 h-9 px-3 rounded-xl ${
+                className={`flex items-center space-x-1 transition-all duration-300 h-8 px-2 rounded-lg ${
                   isFollowing
-                    ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg"
-                    : "bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 hover:text-cyan-700 border border-cyan-200/50 hover:shadow-md"
+                    ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border border-gray-200"
                 }`}
               >
-                <UserPlus className="h-5 w-5" />
-                <span className="text-sm font-bold">{followerCount}</span>
+                <UserPlus className="h-4 w-4" />
+                <span className="text-xs">{followerCount}</span>
               </Button>
             </div>
 
-            {/* Bet Button */}
-            <div className="pt-2">
+            {/* Bet Button - Only element with gradient background */}
+            <div className="pt-1">
               <Sheet open={isPledging} onOpenChange={setIsPledging}>
                 <SheetTrigger asChild>
                   <Button 
                     size="lg"
                     className={cn(
-                      "w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 text-base h-12 shadow-xl hover:shadow-cyan-600/25",
+                      "w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg transition-all duration-300 text-sm h-10 shadow hover:shadow-md",
                       selectedOption && "ring-2 ring-cyan-500/50"
                     )}
                     disabled={!selectedOption}
                   >
-                    <Zap className="w-5 h-5 mr-2" />
+                    <Zap className="w-4 h-4 mr-1" />
                     pledge now
                   </Button>
                 </SheetTrigger>
                 
-                <SheetContent className="bg-white border-l border-cyan-200/50 w-full max-w-md">
+                <SheetContent className="bg-white border-l border-gray-200 w-full max-w-md">
                   <SheetHeader>
-                    <SheetTitle className="text-cyan-700 text-lg font-black flex items-center gap-2">
-                      <Trophy className="w-6 h-6 text-cyan-600" />
+                    <SheetTitle className="text-cyan-700 text-base flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-cyan-600" />
                       bet placement
                     </SheetTitle>
                     <SheetDescription className="text-gray-600 text-sm">
@@ -372,24 +370,24 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                     </SheetDescription>
                   </SheetHeader>
                   
-                  <div className="space-y-4 mt-6">
+                  <div className="space-y-4 mt-4">
                     <div className="space-y-2">
-                      <label className="text-gray-700 text-sm font-bold">amount (₿)</label>
+                      <label className="text-gray-700 text-sm">amount (₿)</label>
                       <input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-white border border-cyan-300/50 rounded-xl px-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-600/30 focus:border-cyan-500 transition-all text-base font-semibold shadow-lg"
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-600/30 focus:border-cyan-500 transition-all text-sm shadow"
                       />
                     </div>
                     
                     <Button
                       size="lg"
                       onClick={() => handlePledge(games.home_team, games.away_team, games.date)}
-                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-black rounded-xl py-3 text-base shadow-2xl hover:shadow-cyan-600/25 transition-all duration-300"
+                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg py-2 text-sm shadow hover:shadow-md transition-all duration-300"
                     >
-                      🎯 confirm  bet
+                      🎯 confirm bet
                     </Button>
                   </div>
                 </SheetContent>
@@ -397,17 +395,17 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
             </div>
 
             {/* Additional Stats */}
-            <div className="flex justify-center gap-6 pt-2">
+            <div className="flex justify-center gap-4 pt-1">
               <div className="text-center">
                 <div className="flex items-center gap-1 text-gray-500 hover:text-cyan-700 transition-colors cursor-pointer">
-                  <Eye className="w-4 h-4" />
-                  <span className="text-xs font-semibold">2.1K</span>
+                  <Eye className="w-3 h-3" />
+                  <span className="text-xs">2.1K</span>
                 </div>
               </div>
               <div className="text-center">
                 <div className="flex items-center gap-1 text-gray-500 hover:text-cyan-700 transition-colors cursor-pointer">
-                  <Share2 className="w-4 h-4" />
-                  <span className="text-xs font-semibold">Share</span>
+                  <Share2 className="w-3 h-3" />
+                  <span className="text-xs">Share</span>
                 </div>
               </div>
             </div>

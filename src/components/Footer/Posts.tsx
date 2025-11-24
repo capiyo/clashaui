@@ -293,7 +293,7 @@ const Posts = () => {
             <div className="w-full p-6 border-t border-gray-100 bg-white sticky bottom-0">
               <button
                 onClick={fetchPosts}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-4 rounded-lg flex items-center justify-center gap-3 text-base font-semibold shadow-lg"
+                className="w-full  py-4 rounded-lg flex items-center justify-center gap-3 text-base font-semibold shadow-lg"
               >
                 <RefreshCw className="h-5 w-5" />
                 Load New Posts
