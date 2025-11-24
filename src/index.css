@@ -122,74 +122,33 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-@layer components {
-  .sliding-toggle {
-    @apply relative bg-green-100 rounded-full p-1 flex justify-evenly;
-  }
-  
-  .sliding-toggle-button {
-    @apply relative z-10 px-2 py-2 rounded-full text-sm font-medium transition-colors duration-300;
-  }
-  
-  .sliding-toggle-active {
-    @apply text-primary-foreground;
-  }
-  
-  .sliding-toggle-inactive {
-    @apply text-muted-foreground hover:text-foreground;
-  }
-  
-  .sliding-toggle-slider {
-    @apply absolute top-1 left-1 w-1/2 h-[calc(100%-8px)] bg-white  rounded-full transition-transform duration-300 ease-out;
-  }
-  
-  .page-slide-container {
-    @apply relative w-screen h-full overflow-auto;
-  }
-  
-  .page-slide {
-    @apply absolute inset-0 transition-transform duration-500 ease-out;
-  }
-  
-  .game-card {
-    @apply bg-card border border-border rounded-lg  hover:bg-accent/50 transition-colors cursor-pointer;
-  }
-  
-  .post-card {
-    @apply bg-card border border-border  rounded-lg p-4 space-y-3;
+     --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 217 91% 60%;
+
+    --radius: 1rem;
+    
+    /* Cyan accent colors */
+    --cyan: 190 95% 50%;
+    --cyan-light: 190 90% 65%;
+    --cyan-dark: 190 85% 35%;
+    --cyan-glow: 190 95% 50%;
+    
+    /* Navigation specific */
+    --nav-bg: 240 8% 6%;
+    --nav-indicator: 190 95% 50%;
+    --nav-active: 190 95% 50%;
+    --nav-inactive: 240 5% 50%;
+    
+    --nav-indicator: 217 91% 60%;
+    --tab-active: 217 91% 60%;
+    --tab-inactive: 240 5% 50%;
   }
 }
 
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in-left {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
