@@ -61,7 +61,7 @@ export const BottomNavigation = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 overflow-hidden pb-16"> {/* Added padding-bottom to prevent content from being hidden behind absolute nav */}
+      <div className="flex-1 overflow-hidden pb-5"> {/* Added padding-bottom to prevent content from being hidden behind absolute nav */}
         <div className="max-w-4xl mx-auto h-full">
           {/* Main Content Area with Sliding Effect */}
           <div 

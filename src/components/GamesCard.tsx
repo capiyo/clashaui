@@ -90,7 +90,7 @@ const GamesCard = () => {
   return (
     <div className="min-h-screen bg-white p-4">
       {/* Enhanced Stats Bar */}
-      <div className="grid grid-cols-3 gap-3 mb-6 w-full max-w-6xl mx-auto">
+      <div className="grid grid-cols-3 gap-3 mb-6 w-full max-w-[900px] mx-auto">
         <div className="bg-white border border-gray-200 rounded-lg p-3 transition-all duration-300 group">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -130,18 +130,21 @@ const GamesCard = () => {
         </div>
       </div>
 
-      {/* Games Grid - Fixed layout with proper spacing */}
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 justify-items-center">
-        {games.map((game, key) => (
-          <div key={key} className="w-full flex justify-center">
-            <GameCardCyan games={game} teamAvatars={teamAvatars} mockUsers={mockUsers} />
-          </div>
-        ))}
+      {/* Scrollable Games Container */}
+      <div className="w-full overflow-x-auto">
+        {/* Games Grid - 900px container with 450px cards in two columns */}
+        <div className="w-[900px] mx-auto grid grid-cols-2 gap-6 min-h-0">
+          {games.map((game, key) => (
+            <div key={key} className="w-[450px]">
+              <GameCardCyan games={game} teamAvatars={teamAvatars} mockUsers={mockUsers} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Loading State */}
       {games.length === 0 && (
-        <div className="w-full max-w-6xl mx-auto text-center py-16">
+        <div className="w-full max-w-[900px] mx-auto text-center py-16">
           <div className="relative inline-block mb-4">
             <div className="w-16 h-16 border-4 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
           </div>
@@ -214,7 +217,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
 
   return (
     <div
-      className="relative group cursor-pointer w-full max-w-[500px]"
+      className="relative group cursor-pointer w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -222,8 +225,8 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
         "relative transition-all duration-300 w-full",
         isHovered ? "scale-[1.02]" : "scale-100"
       )}>
-        {/* Main Card - Responsive width with max width */}
-        <Card className="relative bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 w-full min-h-[380px] h-auto mx-auto">
+        {/* Main Card - Fixed 450px width */}
+        <Card className="relative bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 w-full min-h-[380px] h-auto">
           <CardHeader className="pb-2 pt-4 px-5">
             <div className="flex items-center justify-between mb-2">
               {/* Country Badge - White background with light cyan text */}

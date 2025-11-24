@@ -72,11 +72,7 @@ const Index = () => {
     <GamesCard/>
   </div>
   {/* Mobile View - Show only one component at a time */}
-  <div className="md:hidden w-full">
-    {/* You can add a toggle or tabs here for mobile */}
-    <Posts/>
-    {/* Or <GamesCard/> depending on your mobile navigation */}
-  </div>
+  
 </div>
      
       </div>
