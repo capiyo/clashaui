@@ -117,7 +117,8 @@ export const BottomNavigation = () => {
                 <ToggleGroupItem
                   key={tab.id}
                   value={tab.id}
-                  className="relative flex items-center justify-center gap-2 px-4 py-2.5 flex-1 data-[state=on]:bg-transparent data-[state=on]:text-background data-[state=off]:text-nav-inactive hover:text-foreground transition-all"
+                  className="relative flex items-center justify-center gap-2 px-4 py-2.5 flex-1 data-[state=on]:bg-transparent
+                   data-[state=on]:text-background data-[state=off]:text-nav-inactive hover:text-foreground transition-all"
                 >
                   {tab.icon}
                   <span className="text-sm">{tab.label}</span>

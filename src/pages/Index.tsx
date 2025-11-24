@@ -44,8 +44,51 @@ const Index = () => {
     <div className="h-screen bg-background flex-row    overflow-hidden  md:flex ">
      
       
-    
-      <div className=""><BottomNavigation/></div>
+    <div className="md:flex flex-row w-full  hidden">
+       <div className="hidden md:flex"> 
+        <SidebarProvider>
+      <AppSidebar />
+      <main>
+        <SidebarTrigger />
+     
+      </main>
+    </SidebarProvider>
+    </div>
+
+
+
+ <div className="flex-col  ">
+      <div className="sm:hidden md:block"><Header />      </div>
+     <div><HeroSection/></div>
+      <div className="flex flex-row min-h-screen w-full">
+  {/* Left Column - Posts */}
+  <div className="hidden md:flex flex-1 max-w-[600px]">
+    <Posts/>
+  </div>
+  
+  {/* Right Column - GamesCard */}
+  
+   <div className="hidden md:flex  max-w-[900px] overflow-auto">
+    <GamesCard/>
+  </div>
+  {/* Mobile View - Show only one component at a time */}
+  <div className="md:hidden w-full">
+    {/* You can add a toggle or tabs here for mobile */}
+    <Posts/>
+    {/* Or <GamesCard/> depending on your mobile navigation */}
+  </div>
+</div>
+     
+      </div>
+      </div>
+      
+      {/* Job Listings Section */}
+      
+
+
+      
+      <MobileNavigation />
+      <div className="md:hidden"><BottomNavigation/></div>
       
      
       

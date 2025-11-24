@@ -130,10 +130,10 @@ const GamesCard = () => {
         </div>
       </div>
 
-      {/* Games Grid - Fixed 500px width with 2 columns on large screens */}
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 justify-center">
+      {/* Games Grid - Fixed layout with proper spacing */}
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 justify-items-center">
         {games.map((game, key) => (
-          <div key={key} className="flex justify-center">
+          <div key={key} className="w-full flex justify-center">
             <GameCardCyan games={game} teamAvatars={teamAvatars} mockUsers={mockUsers} />
           </div>
         ))}
@@ -214,21 +214,20 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
 
   return (
     <div
-      className="relative group cursor-pointer"
+      className="relative group cursor-pointer w-full max-w-[500px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={cn(
-        "relative transition-all duration-300",
+        "relative transition-all duration-300 w-full",
         isHovered ? "scale-[1.02]" : "scale-100"
       )}>
-        {/* Main Card - Fixed 500px width with reduced height - Top cyan line removed */}
-        <Card className="relative bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 w-[500px] min-h-[380px] h-auto">
-          {/* Header Line - REMOVED */}
-          
+        {/* Main Card - Responsive width with max width */}
+        <Card className="relative bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 w-full min-h-[380px] h-auto mx-auto">
           <CardHeader className="pb-2 pt-4 px-5">
             <div className="flex items-center justify-between mb-2">
-              <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+              {/* Country Badge - White background with light cyan text */}
+              <Badge className="bg-white border border-cyan-200 text-cyan-600 text-xs px-3 py-1 rounded-full flex items-center gap-1">
                 <Crown className="w-3 h-3" />
                 {games.league.split(' ')[0].toLowerCase()}
               </Badge>
@@ -242,9 +241,9 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
             <div className="text-center">
               <div className="flex items-center justify-between mb-3">
                 <div className="text-center flex-1">
-                  <Avatar className="w-14 h-14 border-2 border-cyan-300 mx-auto mb-2 group-hover:border-cyan-400 transition-all duration-300">
+                  <Avatar className="w-14 h-14 border-2 border-cyan-200 mx-auto mb-2 group-hover:border-cyan-300 transition-all duration-300">
                     <AvatarImage src={getTeamAvatar(games.home_team)} />
-                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm">
+                    <AvatarFallback className="bg-cyan-100 text-cyan-600 text-sm">
                       {games.home_team.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -253,16 +252,16 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                 </div>
 
                 <div className="flex flex-col items-center mx-3">
-                  {/* VS Button */}
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center shadow">
-                    <span className="text-white text-xs">VS</span>
+                  {/* VS Button - White background with light cyan border */}
+                  <div className="w-10 h-10 rounded-full bg-white border-2 border-cyan-200 flex items-center justify-center shadow">
+                    <span className="text-cyan-600 text-xs">VS</span>
                   </div>
                 </div>
 
                 <div className="text-center flex-1">
-                  <Avatar className="w-14 h-14 border-2 border-cyan-300 mx-auto mb-2 group-hover:border-cyan-400 transition-all duration-300">
+                  <Avatar className="w-14 h-14 border-2 border-cyan-200 mx-auto mb-2 group-hover:border-cyan-300 transition-all duration-300">
                     <AvatarImage src={getTeamAvatar(games.away_team)} />
-                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm">
+                    <AvatarFallback className="bg-cyan-100 text-cyan-600 text-sm">
                       {games.away_team.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -271,10 +270,10 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                 </div>
               </div>
 
-              {/* Draw Odds */}
+              {/* Draw Odds - White background */}
               <div className="pt-2 border-t border-gray-200">
                 <p className="text-gray-600 text-xs mb-1">draw odds</p>
-                <p className="text-cyan-700 text-sm bg-cyan-500/10 py-1 rounded">{games.draw}</p>
+                <p className="text-cyan-600 text-sm bg-white border border-cyan-200 py-1 rounded">{games.draw}</p>
               </div>
             </div>
           </CardHeader>
@@ -286,7 +285,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                 {mockUsers.slice(0, 3).map((user, index) => (
                   <Avatar key={index} className="w-8 h-8 border-2 border-white shadow">
                     <AvatarImage src={user.avatar} />
-                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs">
+                    <AvatarFallback className="bg-cyan-100 text-cyan-600 text-xs">
                       {user.name[0]}
                     </AvatarFallback>
                   </Avatar>
@@ -333,7 +332,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                 onClick={handleFollow}
                 className={`flex items-center space-x-1 transition-all duration-300 h-8 px-2 rounded-lg ${
                   isFollowing
-                    ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow"
+                    ? "bg-cyan-100 text-cyan-600 border border-cyan-300 shadow"
                     : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border border-gray-200"
                 }`}
               >
@@ -342,14 +341,14 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
               </Button>
             </div>
 
-            {/* Bet Button - Only element with gradient background */}
+            {/* Bet Button - Light cyan background */}
             <div className="pt-1">
               <Sheet open={isPledging} onOpenChange={setIsPledging}>
                 <SheetTrigger asChild>
                   <Button 
                     size="lg"
                     className={cn(
-                      "w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg transition-all duration-300 text-sm h-10 shadow hover:shadow-md",
+                      "w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 border border-cyan-300 rounded-lg transition-all duration-300 text-sm h-10 shadow hover:shadow-md",
                       selectedOption && "ring-2 ring-cyan-500/50"
                     )}
                     disabled={!selectedOption}
@@ -385,7 +384,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                     <Button
                       size="lg"
                       onClick={() => handlePledge(games.home_team, games.away_team, games.date)}
-                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg py-2 text-sm shadow hover:shadow-md transition-all duration-300"
+                      className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 border border-cyan-300 rounded-lg py-2 text-sm shadow hover:shadow-md transition-all duration-300"
                     >
                       🎯 confirm bet
                     </Button>
