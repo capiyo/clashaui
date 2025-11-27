@@ -16,7 +16,7 @@ import {
   Zap,
   Sparkles
 } from "lucide-react";
-import GamesCard from "../GamesCard";
+import GamesCard from "../Home/Games/GamesCard";
 import Posts from "../Footer/Posts";
 
 type PageType = "games" | "posts";

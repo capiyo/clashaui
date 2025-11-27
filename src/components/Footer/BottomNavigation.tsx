@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Gamepad2, Radio, FileText } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Posts from "./Posts";
-import GamesCard from "../GamesCard";
+import GamesCard from "../Home/Games/GamesCard";
 
 type TabType = "posts" | "games" | "live";
 
@@ -117,8 +117,7 @@ export const BottomNavigation = () => {
                 <ToggleGroupItem
                   key={tab.id}
                   value={tab.id}
-                  className="relative flex items-center justify-center gap-2 px-4 py-2.5 flex-1 data-[state=on]:bg-transparent
-                   data-[state=on]:text-background data-[state=off]:text-nav-inactive hover:text-foreground transition-all"
+                  className="relative flex items-center justify-center gap-2 px-4 py-2.5 flex-1 data-[state=on]:bg-transparent data-[state=on]:text-gray-600 data-[state=off]:text-gray-400 hover:text-gray-600 transition-all"
                 >
                   {tab.icon}
                   <span className="text-sm">{tab.label}</span>

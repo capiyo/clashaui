@@ -3,6 +3,7 @@ import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const API_BASE_URL = 'https://clashaapi.onrender.com';
+const localUrl="http://localhost:3000"
 
 interface Post {
   id: string;
@@ -37,22 +38,33 @@ const Posts = () => {
       setLoading(true);
       setError("");
       
-      const response = await fetch(`${API_BASE_URL}/api/posts`, {
+      console.log("Fetching posts from:", `${API_BASE_URL}/api/posts`);
+      
+      const response = await fetch(`${localUrl}/api/posts`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        mode: 'cors',
+        credentials: 'omit'
       });
+      
+      console.log("Response status:", response.status, response.statusText);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
       }
       
       const data: ApiResponse = await response.json();
+      console.log("API Response:", data);
       
       if (data.success && Array.isArray(data.posts)) {
-        setPosts(data.posts);
+        const postsWithValidatedUrls = data.posts.map(post => ({
+          ...post,
+          image_url: validateImageUrl(post.image_url)
+        }));
+        setPosts(postsWithValidatedUrls);
       } else {
         throw new Error("Invalid response format: missing posts array");
       }
@@ -66,29 +78,64 @@ const Posts = () => {
     }
   };
 
-  const getFullImageUrl = (imageUrl: string): string => {
-    if (!imageUrl) return '';
+  const validateImageUrl = (imageUrl: string): string => {
+    if (!imageUrl || imageUrl.trim() === '') {
+      return '';
+    }
     
-    if (imageUrl.startsWith('http')) {
+    // If it's already a full URL, return as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
       return imageUrl;
     }
     
+    // If it starts with //, add https:
+    if (imageUrl.startsWith('//')) {
+      return `https:${imageUrl}`;
+    }
+    
+    // If it's an absolute path, prepend the API base URL
     if (imageUrl.startsWith('/')) {
       return `${API_BASE_URL}${imageUrl}`;
     }
     
+    // For relative paths, prepend API base URL with slash
     return `${API_BASE_URL}/${imageUrl}`;
   };
 
+  const getFullImageUrl = (imageUrl: string): string => {
+    const validatedUrl = validateImageUrl(imageUrl);
+    
+    // If no valid URL, return empty string
+    if (!validatedUrl) return '';
+    
+    // Add cache busting parameter to avoid cached broken images
+    const separator = validatedUrl.includes('?') ? '&' : '?';
+    return `${validatedUrl}${separator}t=${Date.now()}`;
+  };
+
+  // Diagnostic effect to check image loading
   useEffect(() => {
     if (posts.length > 0) {
-      console.log("Image URLs debug:");
-      posts.forEach(post => {
+      console.log("=== IMAGE DIAGNOSTICS ===");
+      console.log("User Agent:", navigator.userAgent);
+      console.log("Platform:", navigator.platform);
+      
+      posts.forEach((post, index) => {
         const fullUrl = getFullImageUrl(post.image_url);
-        console.log(`Post ${post.id}:`, {
+        console.log(`Post ${index} (${post.id}):`, {
           original: post.image_url,
-          full: fullUrl
+          validated: validateImageUrl(post.image_url),
+          full: fullUrl,
+          hasImage: !!post.image_url && post.image_url.trim() !== ''
         });
+        
+        // Preload images for diagnostics
+        if (fullUrl) {
+          const img = new Image();
+          img.src = fullUrl;
+          img.onload = () => console.log(`✅ Image preloaded: ${fullUrl}`);
+          img.onerror = () => console.log(`❌ Image preload failed: ${fullUrl}`);
+        }
       });
     }
   }, [posts]);
@@ -146,7 +193,7 @@ const Posts = () => {
     const mockPosts: Post[] = [
       {
         id: '1',
-        image_url: 'https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=400&h=400&fit=crop',
+        image_url: 'https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=600&h=600&fit=crop',
         caption: 'Beautiful sunset at the beach! 🌅 #sunset #beach #nature',
         user_name: 'John Doe',
         user_id: 'user123',
@@ -154,7 +201,7 @@ const Posts = () => {
       },
       {
         id: '2',
-        image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+        image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop',
         caption: 'Exploring the mountains today! 🏔️ #adventure #mountains #hiking',
         user_name: 'Jane Smith',
         user_id: 'user456',
@@ -162,7 +209,7 @@ const Posts = () => {
       },
       {
         id: '3',
-        image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop',
+        image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop',
         caption: 'Fashion week vibes! 👗✨ #fashion #style #ootd',
         user_name: 'Emma Wilson',
         user_id: 'user789',
@@ -170,7 +217,7 @@ const Posts = () => {
       },
       {
         id: '4',
-        image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop',
+        image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop',
         caption: 'Healthy breakfast to start the day right! 🥑🍳 #healthy #food #breakfast',
         user_name: 'Mike Johnson',
         user_id: 'user101',
@@ -293,7 +340,7 @@ const Posts = () => {
             <div className="w-full p-6 border-t border-gray-100 bg-white sticky bottom-0">
               <button
                 onClick={fetchPosts}
-                className="w-full  py-4 rounded-lg flex items-center justify-center gap-3 text-base font-semibold shadow-lg"
+                className="w-full  text-white py-4 rounded-lg flex items-center justify-center gap-3 text-base font-semibold shadow-lg"
               >
                 <RefreshCw className="h-5 w-5" />
                 Load New Posts
@@ -306,7 +353,7 @@ const Posts = () => {
   );
 };
 
-// Post Card Component (keep your existing PostCard component exactly as is)
+// Post Card Component
 interface PostCardProps {
   post: Post;
   isLiked: boolean;
@@ -332,28 +379,61 @@ const PostCard: React.FC<PostCardProps> = ({
   const [showFullCaption, setShowFullCaption] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
   const [hasValidImage, setHasValidImage] = useState<boolean>(false);
+  const [retryCount, setRetryCount] = useState<number>(0);
 
   const shouldTruncate = post.caption && post.caption.length > 80;
-  const fullImageUrl = getFullImageUrl(post.image_url);
+  
+  // Enhanced URL with retry mechanism
+  const getImageUrlWithRetry = () => {
+    const baseUrl = getFullImageUrl(post.image_url);
+    if (retryCount > 0) {
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      return `${baseUrl}${separator}retry=${retryCount}&t=${Date.now()}`;
+    }
+    return baseUrl;
+  };
+
+  const fullImageUrl = getImageUrlWithRetry();
 
   useEffect(() => {
-    if (post.image_url && post.image_url.trim() !== '') {
-      setHasValidImage(true);
-    } else {
-      setHasValidImage(false);
-    }
-  }, [post.image_url]);
+    const isValid = post.image_url && 
+                   post.image_url.trim() !== '' && 
+                   post.image_url !== 'null' && 
+                   post.image_url !== 'undefined';
+    setHasValidImage(isValid);
+    setImageError(false);
+    setImageLoaded(false);
+    setRetryCount(0);
+  }, [post.image_url, post.id]);
 
   const handleImageError = () => {
-    console.error("Failed to load image:", fullImageUrl);
-    setImageError(true);
-    setImageLoaded(true);
-    setHasValidImage(false);
+    console.error(`❌ Failed to load image (attempt ${retryCount + 1}):`, fullImageUrl);
+    
+    if (retryCount < 3) {
+      // Retry loading the image
+      setTimeout(() => {
+        setRetryCount(prev => prev + 1);
+        setImageError(false);
+        setImageLoaded(false);
+      }, 1000 * (retryCount + 1)); // Exponential backoff
+    } else {
+      setImageError(true);
+      setImageLoaded(true);
+      setHasValidImage(false);
+    }
   };
 
   const handleImageLoad = () => {
+    console.log("✅ Image loaded successfully:", fullImageUrl);
     setImageLoaded(true);
+    setImageError(false);
     setHasValidImage(true);
+  };
+
+  const handleRetry = () => {
+    setRetryCount(0);
+    setImageError(false);
+    setImageLoaded(false);
   };
 
   return (
@@ -381,41 +461,41 @@ const PostCard: React.FC<PostCardProps> = ({
         </div>
       </div>
 
-      {/* Image Section */}
-      {hasValidImage && (
+      {/* ONLY CHANGE: Completely hide image section when no image or image fails to load */}
+      {hasValidImage && !imageError && (
         <div className="relative bg-gray-50 w-full">
-          {!imageLoaded && !imageError && (
+          {!imageLoaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-              <div className="w-10 h-10 border-2 border-gray-300 border-t-cyan-500 rounded-full animate-spin"></div>
-            </div>
-          )}
-          {imageError ? (
-            <div className="w-full aspect-square flex items-center justify-center bg-gray-100">
-              <div className="text-center text-gray-500">
-                <div className="text-4xl mb-3">📷</div>
-                <p className="text-base">Image not available</p>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-10 h-10 border-2 border-gray-300 border-t-cyan-500 rounded-full animate-spin"></div>
+                <p className="text-gray-500 text-sm">Loading image...</p>
+                {retryCount > 0 && (
+                  <p className="text-gray-400 text-xs">Attempt {retryCount + 1}/3</p>
+                )}
               </div>
             </div>
-          ) : (
-            <img
-              src={fullImageUrl}
-              alt={post.caption || `Post by ${post.user_name}`}
-              className={`w-full object-cover transition-opacity duration-300 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{ 
-                maxHeight: '70vh',
-                minHeight: '300px'
-              }}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-            />
           )}
+          
+          <img
+            src={fullImageUrl}
+            alt={post.caption || `Post by ${post.user_name}`}
+            className={`w-full object-contain transition-opacity duration-300 bg-gray-100 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ 
+              maxHeight: '70vh',
+              minHeight: '300px'
+            }}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            loading="lazy"
+            crossOrigin="anonymous"
+          />
         </div>
       )}
 
       {/* Footer */}
-      <div className={`p-4 ${!hasValidImage ? 'pt-0' : ''}`}>
+      <div className="p-4">
         {/* Actions */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-4">

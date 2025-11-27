@@ -12,7 +12,7 @@ import { reducers } from './components/ReduxPages/reducers';
 import { Context } from './components/ContextProvider/Context';
 import {store} from "./components/ReduxPages/reducers/store.js"
 import { JobDetails } from "./components/Case/JobDetails.js";
-import GamesCard from "./components/GamesCard.js";
+import GamesCard from "./components/Home/Games/GamesCard.js";
 import JobCard from "./components/Core/JobCard.js";
 import Posts from "./components/Footer/Posts.js";
 

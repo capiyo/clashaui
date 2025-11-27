@@ -16,7 +16,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/Home/SideBar";
 import Base from "@/components/Slider/base";
 import SlidingPagesToggle from "@/components/components/SlidingPagesToggle";
-import GamesCard from "@/components/GamesCard";
+import GamesCard from "@/components/Home/Games/GamesCard";
 import Posts from "@/components/Footer/Posts";
 import JobCard  from "@/components/Core/JobCard"
 import Gamer from "@/components/Gamer";
