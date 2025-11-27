@@ -54,15 +54,12 @@ const Posts = () => {
       const data: ApiResponse = await response.json();
       
       if (data.success && Array.isArray(data.posts)) {
-        // Filter out posts with invalid image URLs and clean the data
-        const validPosts = data.posts
-          .map(post => ({
-            ...post,
-            image_url: cleanImageUrl(post.image_url)
-          }))
-          .filter(post => hasValidImage(post.image_url)); // Only keep posts with valid images
-          
-        setPosts(validPosts);
+        const cleanedPosts = data.posts.map(post => ({
+          ...post,
+          image_url: cleanImageUrl(post.image_url)
+        }));
+        
+        setPosts(cleanedPosts);
       } else {
         throw new Error("Invalid response format");
       }
@@ -78,15 +75,17 @@ const Posts = () => {
 
   const cleanImageUrl = (imageUrl: string): string => {
     if (!imageUrl || 
+        typeof imageUrl !== 'string' ||
         imageUrl.trim() === '' || 
         imageUrl === 'null' || 
         imageUrl === 'undefined' ||
         imageUrl === 'NaN' ||
-        imageUrl.toLowerCase() === 'none') {
+        imageUrl.toLowerCase() === 'none' ||
+        imageUrl === 'false' ||
+        imageUrl === 'true') {
       return '';
     }
     
-    // Clean the URL
     let cleanedUrl = imageUrl.trim();
     
     if (cleanedUrl.startsWith('http://') || cleanedUrl.startsWith('https://')) {
@@ -110,14 +109,13 @@ const Posts = () => {
     const invalidValues = ['null', 'undefined', 'nan', 'none', 'false', 'true'];
     if (invalidValues.includes(imageUrl.toLowerCase())) return false;
     
-    // Check if it's a valid URL format
-    try {
-      const url = new URL(imageUrl);
-      return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
-      // If it's not a valid URL, it might be a relative path
-      return imageUrl.length > 5; // Basic length check for valid paths
+    if (imageUrl.includes('placeholder') || 
+        imageUrl.includes('default') || 
+        imageUrl.includes('missing')) {
+      return false;
     }
+    
+    return true;
   };
 
   const handleLike = (postId: string): void => {
@@ -181,7 +179,7 @@ const Posts = () => {
       },
       {
         id: '2',
-        image_url: '', // This post will have NO image section
+        image_url: '', // No image - will be completely hidden
         caption: 'Exploring the mountains today! 🏔️ Fresh air and amazing views make every step worth it. #adventure #mountains #hiking',
         user_name: 'Jane Smith',
         user_id: 'user456',
@@ -189,19 +187,11 @@ const Posts = () => {
       },
       {
         id: '3',
-        image_url: 'null', // This post will have NO image section
+        image_url: 'null', // No image - will be completely hidden
         caption: 'Just a text update about my day! Thinking about life and coding. #thoughts #day',
         user_name: 'Mike Johnson',
         user_id: 'user789',
         created_at: Math.floor(Date.now() / 1000) - 3 * 60 * 60,
-      },
-      {
-        id: '4',
-        image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop',
-        caption: 'Fashion week vibes! 👗✨ So inspired by all the creativity around. #fashion #style #ootd',
-        user_name: 'Emma Wilson',
-        user_id: 'user101',
-        created_at: Math.floor(Date.now() / 1000) - 8 * 60 * 60,
       },
     ];
     
@@ -333,7 +323,7 @@ const Posts = () => {
   );
 };
 
-// Post Card Component
+// SIMPLIFIED Post Card Component - No image state management for invalid images
 interface PostCardProps {
   post: Post;
   isLiked: boolean;
@@ -353,34 +343,17 @@ const PostCard: React.FC<PostCardProps> = ({
   formatTimeAgo,
   getInitials,
 }) => {
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [showFullCaption, setShowFullCaption] = useState<boolean>(false);
-  const [imageError, setImageError] = useState<boolean>(false);
 
   const shouldTruncate = post.caption && post.caption.length > 120;
   
-  // STRICT image validation - only show image if we have a valid, non-empty URL
+  // Simple check - if no valid image URL, don't render ANY image-related code
   const hasValidImage = post.image_url && 
                        post.image_url.trim() !== '' && 
                        post.image_url !== 'null' && 
                        post.image_url !== 'undefined' &&
                        !post.image_url.toLowerCase().includes('null') &&
                        !post.image_url.toLowerCase().includes('undefined');
-
-  useEffect(() => {
-    setImageLoaded(false);
-    setImageError(false);
-  }, [post.id]);
-
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-    setImageError(false);
-  };
-
-  const handleImageError = () => {
-    setImageError(true);
-    setImageLoaded(true);
-  };
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm hover:shadow-md transition-all duration-300 hover:border-cyan-200/70">
@@ -407,50 +380,13 @@ const PostCard: React.FC<PostCardProps> = ({
         </div>
       </div>
 
-      {/* Image Section - COMPLETELY HIDDEN when no valid image */}
-      {hasValidImage ? (
-        <div className="relative bg-gradient-to-br from-cyan-50/50 to-cyan-100/30 border-y border-cyan-100/30">
-          {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex flex-col items-center gap-1.5">
-                <div className="w-7 h-7 border-2 border-cyan-200 border-t-cyan-400 rounded-full animate-spin"></div>
-                <p className="text-cyan-600/60 text-[10px]">Loading image...</p>
-              </div>
-            </div>
-          )}
-          
-          {!imageError ? (
-            <img
-              src={post.image_url}
-              alt={post.caption || `Post by ${post.user_name}`}
-              className={`w-full object-cover transition-all duration-500 ${
-                imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-              }`}
-              style={{ 
-                maxHeight: '70vh',
-                minHeight: '300px'
-              }}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-              loading="lazy"
-              crossOrigin="anonymous"
-            />
-          ) : (
-            <div className="w-full aspect-[4/3] flex flex-col items-center justify-center bg-gradient-to-br from-cyan-50/50 to-cyan-100/30 p-4">
-              <div className="text-center text-cyan-600/40">
-                <div className="text-2xl mb-2">📷</div>
-                <p className="text-[10px] font-medium">Image not available</p>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        // No image section at all - completely hidden
-        null
+      {/* Image Section - ONLY rendered when hasValidImage is TRUE */}
+      {hasValidImage && (
+        <ImageSection imageUrl={post.image_url} caption={post.caption} userName={post.user_name} />
       )}
 
-      {/* Footer */}
-      <div className={`p-3 ${!hasValidImage ? 'pt-0' : ''}`}>
+      {/* Footer - No conditional padding needed */}
+      <div className="p-3">
         {/* Actions */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -528,6 +464,62 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+// Separate component for image handling - only used when we actually have an image
+interface ImageSectionProps {
+  imageUrl: string;
+  caption?: string;
+  userName: string;
+}
+
+const ImageSection: React.FC<ImageSectionProps> = ({ imageUrl, caption, userName }) => {
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+  const [imageError, setImageError] = useState<boolean>(false);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
+  // If image fails to load, don't show anything
+  if (imageError) {
+    return null;
+  }
+
+  return (
+    <div className="relative bg-gradient-to-br from-cyan-50/50 to-cyan-100/30">
+      {!imageLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-cyan-50/30">
+          <div className="flex flex-col items-center gap-1.5">
+            <div className="w-7 h-7 border-2 border-cyan-200 border-t-cyan-400 rounded-full animate-spin"></div>
+            <p className="text-cyan-600/60 text-[10px]">Loading image...</p>
+          </div>
+        </div>
+      )}
+      
+      <img
+        src={imageUrl}
+        alt={caption || `Post by ${userName}`}
+        className={`w-full object-cover transition-all duration-500 ${
+          imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+        }`}
+        style={{ 
+          maxHeight: '70vh',
+          minHeight: '300px'
+        }}
+        onLoad={handleImageLoad}
+        onError={handleImageError}
+        loading="lazy"
+        crossOrigin="anonymous"
+      />
     </div>
   );
 };
