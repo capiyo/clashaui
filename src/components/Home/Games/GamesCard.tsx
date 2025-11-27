@@ -80,7 +80,7 @@ const GamesCard = () => {
 
   async function fetchUsers(): Promise<GamesCardProps[]> {
     try {
-      const response = await fetch(localUrl);
+      const response = await fetch(API_BASE_URL);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

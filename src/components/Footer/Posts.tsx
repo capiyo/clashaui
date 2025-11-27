@@ -40,7 +40,7 @@ const Posts = () => {
       
       console.log("Fetching posts from:", `${API_BASE_URL}/api/posts`);
       
-      const response = await fetch(`${localUrl}/api/posts`, {
+      const response = await fetch(`${API_BASE_URL}/api/posts`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
