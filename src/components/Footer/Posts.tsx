@@ -1,10 +1,8 @@
-
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useState,useRef,useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const API_BASE_URL = 'https://clashaapi.onrender.com';
-const localUrl="http://localhost:3000"
 
 interface Post {
   id: string;
@@ -39,8 +37,6 @@ const Posts = () => {
       setLoading(true);
       setError("");
       
-      console.log("Fetching posts from:", `${API_BASE_URL}/api/posts`);
-      
       const response = await fetch(`${API_BASE_URL}/api/posts`, {
         method: 'GET',
         headers: {
@@ -51,23 +47,24 @@ const Posts = () => {
         credentials: 'omit'
       });
       
-      console.log("Response status:", response.status, response.statusText);
-      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data: ApiResponse = await response.json();
-      console.log("API Response:", data);
       
       if (data.success && Array.isArray(data.posts)) {
-        const postsWithValidatedUrls = data.posts.map(post => ({
-          ...post,
-          image_url: validateImageUrl(post.image_url)
-        }));
-        setPosts(postsWithValidatedUrls);
+        // Filter out posts with invalid image URLs and clean the data
+        const validPosts = data.posts
+          .map(post => ({
+            ...post,
+            image_url: cleanImageUrl(post.image_url)
+          }))
+          .filter(post => hasValidImage(post.image_url)); // Only keep posts with valid images
+          
+        setPosts(validPosts);
       } else {
-        throw new Error("Invalid response format: missing posts array");
+        throw new Error("Invalid response format");
       }
       
     } catch (err) {
@@ -79,67 +76,49 @@ const Posts = () => {
     }
   };
 
-  const validateImageUrl = (imageUrl: string): string => {
-    if (!imageUrl || imageUrl.trim() === '') {
+  const cleanImageUrl = (imageUrl: string): string => {
+    if (!imageUrl || 
+        imageUrl.trim() === '' || 
+        imageUrl === 'null' || 
+        imageUrl === 'undefined' ||
+        imageUrl === 'NaN' ||
+        imageUrl.toLowerCase() === 'none') {
       return '';
     }
     
-    // If it's already a full URL, return as is
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return imageUrl;
+    // Clean the URL
+    let cleanedUrl = imageUrl.trim();
+    
+    if (cleanedUrl.startsWith('http://') || cleanedUrl.startsWith('https://')) {
+      return cleanedUrl;
     }
     
-    // If it starts with //, add https:
-    if (imageUrl.startsWith('//')) {
-      return `https:${imageUrl}`;
+    if (cleanedUrl.startsWith('//')) {
+      return `https:${cleanedUrl}`;
     }
     
-    // If it's an absolute path, prepend the API base URL
-    if (imageUrl.startsWith('/')) {
-      return `${API_BASE_URL}${imageUrl}`;
+    if (cleanedUrl.startsWith('/')) {
+      return `${API_BASE_URL}${cleanedUrl}`;
     }
     
-    // For relative paths, prepend API base URL with slash
-    return `${API_BASE_URL}/${imageUrl}`;
+    return `${API_BASE_URL}/${cleanedUrl}`;
   };
 
-  const getFullImageUrl = (imageUrl: string): string => {
-    const validatedUrl = validateImageUrl(imageUrl);
+  const hasValidImage = (imageUrl: string): boolean => {
+    if (!imageUrl || imageUrl.trim() === '') return false;
     
-    // If no valid URL, return empty string
-    if (!validatedUrl) return '';
+    const invalidValues = ['null', 'undefined', 'nan', 'none', 'false', 'true'];
+    if (invalidValues.includes(imageUrl.toLowerCase())) return false;
     
-    // Add cache busting parameter to avoid cached broken images
-    const separator = validatedUrl.includes('?') ? '&' : '?';
-    return `${validatedUrl}${separator}t=${Date.now()}`;
-  };
-
-  // Diagnostic effect to check image loading
-  useEffect(() => {
-    if (posts.length > 0) {
-      console.log("=== IMAGE DIAGNOSTICS ===");
-      console.log("User Agent:", navigator.userAgent);
-      console.log("Platform:", navigator.platform);
-      
-      posts.forEach((post, index) => {
-        const fullUrl = getFullImageUrl(post.image_url);
-        console.log(`Post ${index} (${post.id}):`, {
-          original: post.image_url,
-          validated: validateImageUrl(post.image_url),
-          full: fullUrl,
-          hasImage: !!post.image_url && post.image_url.trim() !== ''
-        });
-        
-        // Preload images for diagnostics
-        if (fullUrl) {
-          const img = new Image();
-          img.src = fullUrl;
-          img.onload = () => console.log(`✅ Image preloaded: ${fullUrl}`);
-          img.onerror = () => console.log(`❌ Image preload failed: ${fullUrl}`);
-        }
-      });
+    // Check if it's a valid URL format
+    try {
+      const url = new URL(imageUrl);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      // If it's not a valid URL, it might be a relative path
+      return imageUrl.length > 5; // Basic length check for valid paths
     }
-  }, [posts]);
+  };
 
   const handleLike = (postId: string): void => {
     setLikedPosts(prev => {
@@ -194,67 +173,73 @@ const Posts = () => {
     const mockPosts: Post[] = [
       {
         id: '1',
-        image_url: 'https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=600&h=600&fit=crop',
-        caption: 'Beautiful sunset at the beach! 🌅 #sunset #beach #nature',
+        image_url: 'https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=400&h=400&fit=crop',
+        caption: 'Beautiful sunset at the beach! 🌅 The colors were absolutely breathtaking today. #sunset #beach #nature',
         user_name: 'John Doe',
         user_id: 'user123',
         created_at: Math.floor(Date.now() / 1000) - 2 * 60 * 60,
       },
       {
         id: '2',
-        image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop',
-        caption: 'Exploring the mountains today! 🏔️ #adventure #mountains #hiking',
+        image_url: '', // This post will have NO image section
+        caption: 'Exploring the mountains today! 🏔️ Fresh air and amazing views make every step worth it. #adventure #mountains #hiking',
         user_name: 'Jane Smith',
         user_id: 'user456',
         created_at: Math.floor(Date.now() / 1000) - 5 * 60 * 60,
       },
       {
         id: '3',
-        image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop',
-        caption: 'Fashion week vibes! 👗✨ #fashion #style #ootd',
-        user_name: 'Emma Wilson',
+        image_url: 'null', // This post will have NO image section
+        caption: 'Just a text update about my day! Thinking about life and coding. #thoughts #day',
+        user_name: 'Mike Johnson',
         user_id: 'user789',
-        created_at: Math.floor(Date.now() / 1000) - 8 * 60 * 60,
+        created_at: Math.floor(Date.now() / 1000) - 3 * 60 * 60,
       },
       {
         id: '4',
-        image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop',
-        caption: 'Healthy breakfast to start the day right! 🥑🍳 #healthy #food #breakfast',
-        user_name: 'Mike Johnson',
+        image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop',
+        caption: 'Fashion week vibes! 👗✨ So inspired by all the creativity around. #fashion #style #ootd',
+        user_name: 'Emma Wilson',
         user_id: 'user101',
-        created_at: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+        created_at: Math.floor(Date.now() / 1000) - 8 * 60 * 60,
       },
     ];
-    setPosts(mockPosts);
+    
+    const cleanedPosts = mockPosts.map(post => ({
+      ...post,
+      image_url: cleanImageUrl(post.image_url)
+    }));
+    
+    setPosts(cleanedPosts);
     setError("");
     setLoading(false);
   };
 
   if (loading) {
     return (
-      <div className="h-screen bg-white overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-white overflow-hidden">
         <div className="h-full overflow-y-auto">
-          <div className="max-w-2xl mx-auto">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white border-b border-gray-200 animate-pulse">
+          <div className="max-w-2xl mx-auto py-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm mb-4 animate-pulse">
                 <div className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                    <div className="w-8 h-8 bg-cyan-200 rounded-full"></div>
                     <div className="space-y-1 flex-1">
-                      <div className="w-24 h-4 bg-gray-200 rounded"></div>
-                      <div className="w-20 h-3 bg-gray-100 rounded"></div>
+                      <div className="w-20 h-3 bg-cyan-200 rounded"></div>
+                      <div className="w-16 h-2 bg-cyan-100 rounded"></div>
                     </div>
                   </div>
                 </div>
-                <div className="w-full h-96 bg-gray-200"></div>
+                <div className="w-full h-80 bg-cyan-200/50"></div>
                 <div className="p-4 space-y-3">
-                  <div className="flex gap-4">
-                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
-                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
-                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                  <div className="flex gap-3">
+                    <div className="w-6 h-6 bg-cyan-200 rounded"></div>
+                    <div className="w-6 h-6 bg-cyan-200 rounded"></div>
+                    <div className="w-6 h-6 bg-cyan-200 rounded"></div>
                   </div>
-                  <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
-                  <div className="w-1/2 h-3 bg-gray-200 rounded"></div>
+                  <div className="w-3/4 h-3 bg-cyan-200 rounded"></div>
+                  <div className="w-1/2 h-2 bg-cyan-100 rounded"></div>
                 </div>
               </div>
             ))}
@@ -266,23 +251,23 @@ const Posts = () => {
 
   if (error) {
     return (
-      <div className="h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-white flex items-center justify-center p-4">
         <div className="text-center max-w-sm">
-          <div className="bg-white rounded-lg p-6 border border-cyan-200 shadow-md">
-            <div className="text-cyan-600 mb-3 text-4xl">⚠️</div>
-            <h3 className="text-cyan-800 font-semibold text-lg mb-2">Failed to load posts</h3>
-            <p className="text-cyan-600 mb-4 text-sm">{error}</p>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-cyan-200/50 shadow-sm">
+            <div className="text-cyan-400 mb-3 text-4xl">📷</div>
+            <h3 className="text-cyan-800 font-semibold text-sm mb-2">Failed to load posts</h3>
+            <p className="text-cyan-600 mb-4 text-xs">{error}</p>
             <div className="space-y-2">
               <button
                 onClick={fetchPosts}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-3 rounded-lg text-sm flex items-center justify-center gap-2"
+                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-3 w-3" />
                 Try Again
               </button>
               <button
                 onClick={useMockData}
-                className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-4 py-3 rounded-lg border border-cyan-300 text-sm"
+                className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-4 py-2 rounded-xl border border-cyan-300/50 text-xs transition-all duration-200"
               >
                 Use Demo Data
               </button>
@@ -294,16 +279,13 @@ const Posts = () => {
   }
 
   return (
-    <div className="h-screen bg-white overflow-hidden">
-      {/* Scrollable container */}
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-white overflow-hidden">
       <div 
         ref={containerRef}
-        className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-200 scrollbar-track-gray-100"
+        className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-200 scrollbar-track-cyan-50/50"
       >
-        {/* Centered content for large screens */}
-        <div className="max-w-2xl mx-auto">
-          {/* Posts Grid */}
-          <div className="w-full">
+        <div className="max-w-2xl mx-auto py-4 px-2">
+          <div className="w-full space-y-4">
             {posts.map((post) => (
               <PostCard
                 key={post.id}
@@ -314,21 +296,19 @@ const Posts = () => {
                 onSave={handleSave}
                 formatTimeAgo={formatTimeAgo}
                 getInitials={getInitials}
-                getFullImageUrl={getFullImageUrl}
               />
             ))}
           </div>
 
-          {/* Empty State */}
           {posts.length === 0 && (
-            <div className="w-full p-8 bg-white border-b border-cyan-200">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm p-8">
               <div className="text-center">
-                <div className="text-cyan-400 mb-4 text-5xl">📷</div>
-                <h3 className="text-cyan-800 font-semibold text-xl mb-3">No posts yet</h3>
-                <p className="text-cyan-600 mb-6 text-base">Be the first to share a moment!</p>
+                <div className="text-cyan-400 mb-3 text-5xl">📷</div>
+                <h3 className="text-cyan-800 font-semibold text-sm mb-2">No posts yet</h3>
+                <p className="text-cyan-600 mb-4 text-xs">Be the first to share a moment!</p>
                 <button
                   onClick={useMockData}
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg text-base font-semibold"
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 shadow-sm"
                 >
                   Load Demo Posts
                 </button>
@@ -336,14 +316,13 @@ const Posts = () => {
             </div>
           )}
 
-          {/* Load More */}
           {posts.length > 0 && (
-            <div className="w-full p-6 border-t border-gray-100 bg-white sticky bottom-0">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm p-4 mt-4 sticky bottom-2">
               <button
                 onClick={fetchPosts}
-                className="w-full  text-white py-4 rounded-lg flex items-center justify-center gap-3 text-base font-semibold shadow-lg"
+                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-200 shadow-sm"
               >
-                <RefreshCw className="h-5 w-5" />
+                <RefreshCw className="h-3 w-3" />
                 Load New Posts
               </button>
             </div>
@@ -363,7 +342,6 @@ interface PostCardProps {
   onSave: (postId: string) => void;
   formatTimeAgo: (timestamp: number) => string;
   getInitials: (name: string) => string;
-  getFullImageUrl: (url: string) => string;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -374,131 +352,79 @@ const PostCard: React.FC<PostCardProps> = ({
   onSave,
   formatTimeAgo,
   getInitials,
-  getFullImageUrl
 }) => {
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [showFullCaption, setShowFullCaption] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
-  const [hasValidImage, setHasValidImage] = useState<boolean>(false);
-  const [retryCount, setRetryCount] = useState<number>(0);
 
-  const shouldTruncate = post.caption && post.caption.length > 80;
+  const shouldTruncate = post.caption && post.caption.length > 120;
   
-  // Enhanced URL with retry mechanism
-  const getImageUrlWithRetry = () => {
-    const baseUrl = getFullImageUrl(post.image_url);
-    if (retryCount > 0) {
-      const separator = baseUrl.includes('?') ? '&' : '?';
-      return `${baseUrl}${separator}retry=${retryCount}&t=${Date.now()}`;
-    }
-    return baseUrl;
-  };
-
-  const fullImageUrl = getImageUrlWithRetry();
+  // STRICT image validation - only show image if we have a valid, non-empty URL
+  const hasValidImage = post.image_url && 
+                       post.image_url.trim() !== '' && 
+                       post.image_url !== 'null' && 
+                       post.image_url !== 'undefined' &&
+                       !post.image_url.toLowerCase().includes('null') &&
+                       !post.image_url.toLowerCase().includes('undefined');
 
   useEffect(() => {
-    const isValid = post.image_url && 
-                   post.image_url.trim() !== '' && 
-                   post.image_url !== 'null' && 
-                   post.image_url !== 'undefined';
-    setHasValidImage(isValid);
-    setImageError(false);
     setImageLoaded(false);
-    setRetryCount(0);
-  }, [post.image_url, post.id]);
-
-  const handleImageError = () => {
-    console.error(`❌ Failed to load image (attempt ${retryCount + 1}):`, fullImageUrl);
-    
-    if (retryCount < 3) {
-      // Retry loading the image
-      setTimeout(() => {
-        setRetryCount(prev => prev + 1);
-        setImageError(false);
-        setImageLoaded(false);
-      }, 1000 * (retryCount + 1)); // Exponential backoff
-    } else {
-      setImageError(true);
-      setImageLoaded(true);
-      setHasValidImage(false);
-    }
-  };
+    setImageError(false);
+  }, [post.id]);
 
   const handleImageLoad = () => {
-    console.log("✅ Image loaded successfully:", fullImageUrl);
     setImageLoaded(true);
     setImageError(false);
-    setHasValidImage(true);
   };
 
-  const handleRetry = () => {
-    setRetryCount(0);
-    setImageError(false);
-    setImageLoaded(false);
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true);
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors duration-200">
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm hover:shadow-md transition-all duration-300 hover:border-cyan-200/70">
       {/* Header */}
-      <div className="p-4">
+      <div className="p-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10 border border-cyan-300 shadow-sm">
-              <AvatarFallback className="bg-cyan-500 text-white font-semibold text-sm">
+          <div className="flex items-center gap-2">
+            <Avatar className="w-7 h-7 border border-cyan-300/50 shadow-sm">
+              <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-cyan-500 text-white font-medium text-[10px]">
                 {getInitials(post.user_name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-800 text-base">{post.user_name}</h3>
-              <div className="flex items-center gap-1 text-gray-500 text-sm">
-                <Clock className="h-3 w-3" />
+              <h3 className="font-semibold text-cyan-900 text-xs">{post.user_name}</h3>
+              <div className="flex items-center gap-1 text-cyan-600/80 text-[10px]">
+                <Clock className="h-2.5 w-2.5" />
                 <span>{formatTimeAgo(post.created_at)}</span>
               </div>
             </div>
           </div>
-          <button className="text-gray-500 hover:text-cyan-600 p-2 rounded-full transition-colors">
-            <MoreHorizontal className="h-4 w-4" />
+          <button className="text-cyan-600/60 hover:text-cyan-700 p-1 rounded-lg transition-colors">
+            <MoreHorizontal className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Image Section with Enhanced Error Handling */}
+      {/* Image Section - COMPLETELY HIDDEN when no valid image */}
       {hasValidImage ? (
-        <div className="relative bg-gray-50 w-full">
+        <div className="relative bg-gradient-to-br from-cyan-50/50 to-cyan-100/30 border-y border-cyan-100/30">
           {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-10 h-10 border-2 border-gray-300 border-t-cyan-500 rounded-full animate-spin"></div>
-                <p className="text-gray-500 text-sm">Loading image...</p>
-                {retryCount > 0 && (
-                  <p className="text-gray-400 text-xs">Attempt {retryCount + 1}/3</p>
-                )}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-7 h-7 border-2 border-cyan-200 border-t-cyan-400 rounded-full animate-spin"></div>
+                <p className="text-cyan-600/60 text-[10px]">Loading image...</p>
               </div>
             </div>
           )}
           
-          {imageError ? (
-            <div className="w-full aspect-square flex flex-col items-center justify-center bg-gray-100 p-4">
-              <div className="text-center text-gray-500">
-                <div className="text-4xl mb-3">📷</div>
-                <p className="text-base mb-2">Image not available</p>
-                <p className="text-sm text-gray-400 mb-4">
-                  {retryCount > 0 ? `Tried ${retryCount} times` : 'Failed to load'}
-                </p>
-                <button
-                  onClick={handleRetry}
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm"
-                >
-                  Try Again
-                </button>
-              </div>
-            </div>
-          ) : (
+          {!imageError ? (
             <img
-              src={fullImageUrl}
+              src={post.image_url}
               alt={post.caption || `Post by ${post.user_name}`}
-              className={`w-full object-contain transition-opacity duration-300 bg-gray-100 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
+              className={`w-full object-cover transition-all duration-500 ${
+                imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
               }`}
               style={{ 
                 maxHeight: '70vh',
@@ -509,70 +435,70 @@ const PostCard: React.FC<PostCardProps> = ({
               loading="lazy"
               crossOrigin="anonymous"
             />
+          ) : (
+            <div className="w-full aspect-[4/3] flex flex-col items-center justify-center bg-gradient-to-br from-cyan-50/50 to-cyan-100/30 p-4">
+              <div className="text-center text-cyan-600/40">
+                <div className="text-2xl mb-2">📷</div>
+                <p className="text-[10px] font-medium">Image not available</p>
+              </div>
+            </div>
           )}
         </div>
       ) : (
-        <div className="w-full aspect-square flex items-center justify-center bg-gray-100">
-          <div className="text-center text-gray-500">
-            <div className="text-4xl mb-3">📷</div>
-            <p className="text-base">No image available</p>
-            {post.image_url && (
-              <p className="text-sm text-gray-400 mt-2">URL: {post.image_url}</p>
-            )}
-          </div>
-        </div>
+        // No image section at all - completely hidden
+        null
       )}
 
       {/* Footer */}
-      <div className="p-4">
+      <div className={`p-3 ${!hasValidImage ? 'pt-0' : ''}`}>
         {/* Actions */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => onLike(post.id)}
-              className={`p-2 transition-all duration-200 ${
-                isLiked ? 'text-red-500 scale-110' : 'text-gray-600 hover:text-red-500'
+              className={`p-1.5 transition-all duration-200 ${
+                isLiked ? 'text-red-500 scale-110' : 'text-cyan-600/70 hover:text-red-500'
               }`}
             >
-              <Heart className={`h-6 w-6 ${isLiked ? 'fill-current' : ''}`} />
+              <Heart className={`h-4.5 w-4.5 ${isLiked ? 'fill-current' : ''}`} />
             </button>
-            <button className="text-gray-600 hover:text-cyan-600 p-2 transition-colors">
-              <MessageCircle className="h-6 w-6" />
+            <button className="text-cyan-600/70 hover:text-cyan-700 p-1.5 transition-colors">
+              <MessageCircle className="h-4.5 w-4.5" />
             </button>
-            <button className="text-gray-600 hover:text-cyan-600 p-2 transition-colors">
-              <Share className="h-6 w-6" />
+            <button className="text-cyan-600/70 hover:text-cyan-700 p-1.5 transition-colors">
+              <Share className="h-4.5 w-4.5" />
             </button>
           </div>
           <button
             onClick={() => onSave(post.id)}
-            className={`p-2 transition-all duration-200 ${
-              isSaved ? 'text-cyan-600 scale-110' : 'text-gray-600 hover:text-cyan-600'
+            className={`p-1.5 transition-all duration-200 ${
+              isSaved ? 'text-cyan-500 scale-110' : 'text-cyan-600/70 hover:text-cyan-700'
             }`}
           >
-            <Bookmark className={`h-6 w-6 ${isSaved ? 'fill-current' : ''}`} />
+            <Bookmark className={`h-4.5 w-4.5 ${isSaved ? 'fill-current' : ''}`} />
           </button>
         </div>
 
         {/* Likes */}
-        <div className="mb-3">
-          <p className="font-semibold text-gray-800 text-base">
+        <div className="mb-2">
+          <p className="font-semibold text-cyan-900 text-xs">
             {Math.floor(Math.random() * 50)} likes
           </p>
         </div>
 
         {/* Caption */}
         {post.caption && (
-          <div className="mb-3">
-            <p className="text-gray-800 text-base">
+          <div className="mb-2">
+            <p className="text-cyan-800 text-xs leading-relaxed">
               <span className="font-semibold">{post.user_name}</span>{' '}
               {shouldTruncate && !showFullCaption 
-                ? `${post.caption.slice(0, 80)}...`
+                ? `${post.caption.slice(0, 120)}...`
                 : post.caption
               }
               {shouldTruncate && (
                 <button
                   onClick={() => setShowFullCaption(!showFullCaption)}
-                  className="ml-2 text-cyan-600 hover:text-cyan-700 font-medium text-base"
+                  className="ml-1 text-cyan-500 hover:text-cyan-600 font-medium text-xs transition-colors"
                 >
                   {showFullCaption ? 'Show less' : 'Show more'}
                 </button>
@@ -582,21 +508,21 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {/* Comments */}
-        <div className="text-gray-600 text-base mb-3">
-          <button className="hover:text-cyan-600 transition-colors">
+        <div className="text-cyan-600/70 text-xs mb-2">
+          <button className="hover:text-cyan-700 transition-colors">
             View {Math.floor(Math.random() * 15)} comments
           </button>
         </div>
 
         {/* Add Comment */}
-        <div className="pt-3 border-t border-gray-100">
-          <div className="flex gap-3">
+        <div className="pt-2 border-t border-cyan-100/50">
+          <div className="flex gap-2">
             <input
               type="text"
               placeholder="Add comment..."
-              className="flex-1 text-base text-gray-800 bg-transparent border-none outline-none placeholder-gray-400"
+              className="flex-1 text-xs text-cyan-900 bg-transparent border-none outline-none placeholder-cyan-600/40"
             />
-            <button className="text-cyan-600 hover:text-cyan-700 font-semibold text-base transition-colors">
+            <button className="text-cyan-500 hover:text-cyan-600 font-semibold text-xs transition-colors">
               Post
             </button>
           </div>

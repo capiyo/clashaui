@@ -32,8 +32,9 @@ const GamesCard = () => {
   const [myName, setMyname] = useState("");
   const [workerEmail, setWorkerEmail] = useState("");
   const [games, setGames] = useState<GamesCardProps[]>([]);
-  const API_BASE_URL = 'https://clashaapi.onrender.com';
-  const localUrl = "http://localhost:3000/api/games";
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const API_BASE_URL = 'https://clashaapi.onrender.com/api/games';
 
   const { toast } = useToast();
 
@@ -57,38 +58,60 @@ const GamesCard = () => {
   useEffect(() => {
     const token = localStorage.getItem("user");
     if (token) {
-      const user = JSON.parse(token);
-      if (user) {
-        setMyId(user._id);
-        setMyname(user.userName);
-        setWorkerEmail(user.userEmail);
+      try {
+        const user = JSON.parse(token);
+        if (user) {
+          setMyId(user._id);
+          setMyname(user.userName);
+          setWorkerEmail(user.userEmail);
+        }
+      } catch (err) {
+        console.error("Error parsing user token:", err);
       }
     }
   }, []);
 
   useEffect(() => {
-    const getUsers = async () => {
+    const getGames = async () => {
       try {
-        const data = await fetchUsers();
+        setLoading(true);
+        setError("");
+        const data = await fetchGames();
         setGames(data);
       } catch (err) {
-        console.log(err);
+        console.error("Error fetching games:", err);
+        setError("Failed to load games");
+        toast({
+          title: "Error",
+          description: "Failed to load games data",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
       }
     };
-    getUsers();
+    getGames();
   }, []);
 
-  async function fetchUsers(): Promise<GamesCardProps[]> {
+  async function fetchGames(): Promise<GamesCardProps[]> {
     try {
-      const response = await fetch(API_BASE_URL);
+      console.log("Fetching games from:", API_BASE_URL);
+      const response = await fetch(API_BASE_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const data: GamesCardProps[] = await response.json();
-      console.log(data);
+      console.log("Games data received:", data);
       return data;
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      console.error("Failed to fetch games:", error);
       throw error;
     }
   }
@@ -136,6 +159,21 @@ const GamesCard = () => {
         </div>
       </div>
 
+      {/* Error State */}
+      {error && (
+        <div className="w-full max-w-[900px] mx-auto text-center py-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-700 text-base">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="mt-2 bg-red-600 hover:bg-red-700 text-white"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Scrollable Games Container */}
       <div className="w-full overflow-x-auto">
         {/* Games Grid - 900px container with 450px cards in two columns */}
@@ -149,12 +187,23 @@ const GamesCard = () => {
       </div>
 
       {/* Loading State */}
-      {games.length === 0 && (
+      {loading && (
         <div className="w-full max-w-[900px] mx-auto text-center py-16">
           <div className="relative inline-block mb-4">
             <div className="w-16 h-16 border-4 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
           </div>
           <p className="text-gray-500 text-base">Loading epic clashes...</p>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && games.length === 0 && !error && (
+        <div className="w-full max-w-[900px] mx-auto text-center py-16">
+          <div className="bg-gray-50 rounded-lg p-8 border border-gray-200">
+            <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">No games available at the moment</p>
+            <p className="text-gray-400 text-sm mt-2">Check back later for new matches</p>
+          </div>
         </div>
       )}
     </div>
@@ -282,9 +331,9 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                   onClick={() => handleTeamSelect("homeTeam")}
                 >
                   <div className={cn(
-                    "relative p-3 rounded-lg  transition-all duration-300",
+                    "relative p-3 rounded-lg transition-all duration-300",
                     selectedOption === "homeTeam" 
-                      ? ""
+                      ? "" 
                       : "border-transparent hover:border-cyan-300 hover:bg-cyan-50/50 group-hover/team:scale-105"
                   )}>
                     <div className="relative">
@@ -347,7 +396,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                   onClick={() => handleTeamSelect("awayTeam")}
                 >
                   <div className={cn(
-                    "relative p-3 rounded-lg  transition-all duration-300",
+                    "relative p-3 rounded-lg transition-all duration-300",
                     selectedOption === "awayTeam" 
                       ? "" 
                       : "border-transparent hover:border-cyan-300 hover:bg-cyan-50/50 group-hover/team:scale-105"
@@ -533,7 +582,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                         ? "bg-cyan-500 hover:bg-cyan-600 text-white border border-cyan-600 ring-2 ring-cyan-500/20" 
                         : selectedOption
                         ? "bg-cyan-100 hover:bg-cyan-200 text-cyan-700 border border-cyan-300"
-                        : "bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-200" // Light cyan for "Select a Team First"
+                        : "bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-200"
                     )}
                     disabled={!selectedOption || !amount}
                   >
