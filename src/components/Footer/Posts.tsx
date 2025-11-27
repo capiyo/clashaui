@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState,useRef,useEffect } from "react";
 
 const API_BASE_URL = 'https://clashaapi.onrender.com';
 const localUrl="http://localhost:3000"
@@ -461,10 +462,10 @@ const PostCard: React.FC<PostCardProps> = ({
         </div>
       </div>
 
-      {/* ONLY CHANGE: Completely hide image section when no image or image fails to load */}
-      {hasValidImage && !imageError && (
+      {/* Image Section with Enhanced Error Handling */}
+      {hasValidImage ? (
         <div className="relative bg-gray-50 w-full">
-          {!imageLoaded && (
+          {!imageLoaded && !imageError && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 border-2 border-gray-300 border-t-cyan-500 rounded-full animate-spin"></div>
@@ -476,21 +477,49 @@ const PostCard: React.FC<PostCardProps> = ({
             </div>
           )}
           
-          <img
-            src={fullImageUrl}
-            alt={post.caption || `Post by ${post.user_name}`}
-            className={`w-full object-contain transition-opacity duration-300 bg-gray-100 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{ 
-              maxHeight: '70vh',
-              minHeight: '300px'
-            }}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            loading="lazy"
-            crossOrigin="anonymous"
-          />
+          {imageError ? (
+            <div className="w-full aspect-square flex flex-col items-center justify-center bg-gray-100 p-4">
+              <div className="text-center text-gray-500">
+                <div className="text-4xl mb-3">📷</div>
+                <p className="text-base mb-2">Image not available</p>
+                <p className="text-sm text-gray-400 mb-4">
+                  {retryCount > 0 ? `Tried ${retryCount} times` : 'Failed to load'}
+                </p>
+                <button
+                  onClick={handleRetry}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={fullImageUrl}
+              alt={post.caption || `Post by ${post.user_name}`}
+              className={`w-full object-contain transition-opacity duration-300 bg-gray-100 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{ 
+                maxHeight: '70vh',
+                minHeight: '300px'
+              }}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              loading="lazy"
+              crossOrigin="anonymous"
+            />
+          )}
+        </div>
+      ) : (
+        <div className="w-full aspect-square flex items-center justify-center bg-gray-100">
+          <div className="text-center text-gray-500">
+            <div className="text-4xl mb-3">📷</div>
+            <p className="text-base">No image available</p>
+            {post.image_url && (
+              <p className="text-sm text-gray-400 mt-2">URL: {post.image_url}</p>
+            )}
+          </div>
         </div>
       )}
 
