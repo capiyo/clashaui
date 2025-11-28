@@ -1,6 +1,6 @@
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw, ImageIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const API_BASE_URL = 'https://clashaapi.onrender.com';
 
@@ -222,33 +222,31 @@ const Posts = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-white">
-        <div className="h-screen overflow-y-auto">
-          <div className="max-w-2xl mx-auto py-4 px-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm mb-4 animate-pulse">
-                <div className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-cyan-200 rounded-full"></div>
-                    <div className="space-y-1 flex-1">
-                      <div className="w-20 h-3 bg-cyan-200 rounded"></div>
-                      <div className="w-16 h-2 bg-cyan-100 rounded"></div>
-                    </div>
+      <div className="h-screen bg-gradient-to-br from-cyan-50 to-white overflow-y-auto">
+        <div className="max-w-2xl mx-auto">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white/80 backdrop-blur-sm border-b border-cyan-100/50 animate-pulse">
+              <div className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-cyan-200 rounded-full"></div>
+                  <div className="space-y-1 flex-1">
+                    <div className="w-20 h-3 bg-cyan-200 rounded"></div>
+                    <div className="w-16 h-2 bg-cyan-100 rounded"></div>
                   </div>
-                </div>
-                <div className="w-full h-80 bg-cyan-200/50"></div>
-                <div className="p-4 space-y-3">
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 bg-cyan-200 rounded"></div>
-                    <div className="w-6 h-6 bg-cyan-200 rounded"></div>
-                    <div className="w-6 h-6 bg-cyan-200 rounded"></div>
-                  </div>
-                  <div className="w-3/4 h-3 bg-cyan-200 rounded"></div>
-                  <div className="w-1/2 h-2 bg-cyan-100 rounded"></div>
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="w-full h-80 bg-cyan-200/50"></div>
+              <div className="p-4 space-y-3">
+                <div className="flex gap-3">
+                  <div className="w-6 h-6 bg-cyan-200 rounded"></div>
+                  <div className="w-6 h-6 bg-cyan-200 rounded"></div>
+                  <div className="w-6 h-6 bg-cyan-200 rounded"></div>
+                </div>
+                <div className="w-3/4 h-3 bg-cyan-200 rounded"></div>
+                <div className="w-1/2 h-2 bg-cyan-100 rounded"></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -256,7 +254,7 @@ const Posts = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-white flex items-center justify-center p-4">
+      <div className="h-screen bg-gradient-to-br from-cyan-50 to-white flex items-center justify-center">
         <div className="text-center max-w-sm w-full">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-cyan-200/50 shadow-sm">
             <div className="text-cyan-400 mb-3 text-4xl">📷</div>
@@ -284,53 +282,50 @@ const Posts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-white">
-      {/* Simple scrollable container */}
-      <div className="h-screen overflow-y-auto">
-        <div className="max-w-2xl mx-auto py-4 px-4">
-          <div className="space-y-4">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                isLiked={likedPosts.has(post.id)}
-                isSaved={savedPosts.has(post.id)}
-                onLike={handleLike}
-                onSave={handleSave}
-                formatTimeAgo={formatTimeAgo}
-                getInitials={getInitials}
-              />
-            ))}
-          </div>
+    <div className="h-screen bg-gradient-to-br from-cyan-50 to-white overflow-y-auto">
+      <div className="max-w-2xl mx-auto">
+        <div className="space-y-0">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              isLiked={likedPosts.has(post.id)}
+              isSaved={savedPosts.has(post.id)}
+              onLike={handleLike}
+              onSave={handleSave}
+              formatTimeAgo={formatTimeAgo}
+              getInitials={getInitials}
+            />
+          ))}
+        </div>
 
-          {posts.length === 0 && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm p-8">
-              <div className="text-center">
-                <div className="text-cyan-400 mb-3 text-5xl">📷</div>
-                <h3 className="text-cyan-800 font-semibold text-sm mb-2">No posts yet</h3>
-                <p className="text-cyan-600 mb-4 text-xs">Be the first to share a moment!</p>
-                <button
-                  onClick={useMockData}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 shadow-sm"
-                >
-                  Load Demo Posts
-                </button>
-              </div>
-            </div>
-          )}
-
-          {posts.length > 0 && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-cyan-100/50 shadow-sm p-4 mt-4">
+        {posts.length === 0 && (
+          <div className="bg-white/80 backdrop-blur-sm border-b border-cyan-100/50 p-8">
+            <div className="text-center">
+              <div className="text-cyan-400 mb-3 text-5xl">📷</div>
+              <h3 className="text-cyan-800 font-semibold text-sm mb-2">No posts yet</h3>
+              <p className="text-cyan-600 mb-4 text-xs">Be the first to share a moment!</p>
               <button
-                onClick={fetchPosts}
-                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-200 shadow-sm"
+                onClick={useMockData}
+                className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 shadow-sm"
               >
-                <RefreshCw className="h-3 w-3" />
-                Load New Posts
+                Load Demo Posts
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {posts.length > 0 && (
+          <div className="bg-white/80 backdrop-blur-sm border-t border-cyan-100/50 p-4 sticky bottom-0">
+            <button
+              onClick={fetchPosts}
+              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-200 shadow-sm"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Load New Posts
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -390,37 +385,18 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   return (
-    <div className={`
-      bg-white/80 backdrop-blur-sm rounded-2xl border shadow-sm
-      ${isTextOnly 
-        ? 'border-cyan-100/30' 
-        : 'border-cyan-100/50'
-      }
-      w-full
-    `}>
+    <div className="bg-white/80 backdrop-blur-sm border-b border-cyan-100/50">
       {/* Header */}
-      <div className={`p-4 ${isTextOnly ? 'pb-3' : ''}`}>
+      <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className={`
-              border shadow-sm
-              ${isTextOnly ? 'w-8 h-8 border-cyan-200/40' : 'w-9 h-9 border-cyan-300/50'}
-            `}>
-              <AvatarFallback className={`
-                text-white font-medium
-                ${isTextOnly 
-                  ? 'bg-gradient-to-br from-cyan-400 to-cyan-500 text-[11px]' 
-                  : 'bg-gradient-to-br from-cyan-500 to-cyan-600 text-xs'
-                }
-              `}>
+            <Avatar className="w-9 h-9 border border-cyan-300/50 shadow-sm">
+              <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white text-xs">
                 {getInitials(post.user_name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className={`
-                font-semibold
-                ${isTextOnly ? 'text-cyan-900 text-sm' : 'text-cyan-900 text-sm'}
-              `}>
+              <h3 className="font-semibold text-cyan-900 text-sm">
                 {post.user_name}
               </h3>
               <div className="flex items-center gap-1 text-cyan-600/70">
@@ -468,13 +444,10 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Content */}
-      <div className={`
-        ${hasValidImage && !imageError ? 'p-4 pt-3' : 'p-4'}
-        ${isTextOnly ? 'bg-cyan-50/30 rounded-lg border border-cyan-100/30' : ''}
-      `}>
+      <div className="p-1">
         {/* Text-only post indicator */}
         {isTextOnly && (
-          <div className="flex items-center gap-2 mb-3 text-cyan-600/60">
+          <div className="flex items-center gap-2  text-cyan-600/60">
             <ImageIcon className="h-4 w-4" />
             <span className="text-xs font-medium">Text Post</span>
           </div>
@@ -482,7 +455,7 @@ const PostCard: React.FC<PostCardProps> = ({
 
         {/* Caption */}
         {post.caption && (
-          <div className={`${isTextOnly ? 'mb-3' : 'mb-2'}`}>
+          <div className="mb-3">
             <p className="text-cyan-800 text-sm leading-relaxed">
               <span className="font-semibold">{post.user_name}</span>{' '}
               {shouldTruncate && !showFullCaption 
@@ -502,7 +475,7 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {/* Actions */}
-        <div className={`${isTextOnly ? 'mb-3' : 'mb-2'}`}>
+        <div className="">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -536,21 +509,21 @@ const PostCard: React.FC<PostCardProps> = ({
         </div>
 
         {/* Likes Count */}
-        <div className={`${isTextOnly ? 'mb-3' : 'mb-2'}`}>
+        <div className="">
           <p className="font-semibold text-cyan-900 text-sm">
             {Math.floor(Math.random() * 50)} likes
           </p>
         </div>
 
         {/* Comments */}
-        <div className={`${isTextOnly ? 'mb-3' : 'mb-2'} text-cyan-600/70 text-sm`}>
+        <div className="text-cyan-600/70 text-sm ">
           <button className="hover:text-cyan-700 transition-colors">
             View {Math.floor(Math.random() * 15)} comments
           </button>
         </div>
 
         {/* Add Comment */}
-        <div className="pt-3 border-t border-cyan-100/50">
+        <div className="pt-3 border-t border-cyan-100/50 hidden">
           <div className="flex gap-3">
             <input
               type="text"
