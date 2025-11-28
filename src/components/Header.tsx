@@ -131,7 +131,7 @@ const Header = () => {
               </div>
             </div>
             <span className="text-lg font-black bg-gradient-to-r from-cyan-600 to-cyan-800 bg-clip-text text-transparent">
-              clash
+              Fanclash
             </span>
           </div>
 

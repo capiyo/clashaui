@@ -174,15 +174,16 @@ const GamesCard = () => {
         </div>
       )}
 
-      {/* Scrollable Games Container */}
-      <div className="w-full overflow-x-auto">
-        {/* Games Grid - 900px container with 450px cards in two columns */}
-        <div className="w-[900px] mx-auto grid grid-cols-2 gap-6 min-h-0">
-          {games.map((game, key) => (
-            <div key={key} className="w-[450px]">
-              <GameCardCyan games={game} teamAvatars={teamAvatars} mockUsers={mockUsers} />
-            </div>
-          ))}
+      {/* Scrollable Games Container - FIXED */}
+      <div className="w-full max-w-[900px] mx-auto">
+        <div className="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-200 scrollbar-track-gray-100 hover:scrollbar-thumb-cyan-300 pr-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {games.map((game, key) => (
+              <div key={key} className="w-full">
+                <GameCardCyan games={game} teamAvatars={teamAvatars} mockUsers={mockUsers} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -210,6 +211,7 @@ const GamesCard = () => {
   );
 };
 
+// ... Keep the rest of your GameCardCyan component exactly the same ...
 function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps; teamAvatars: any; mockUsers: any[] }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isPledging, setIsPledging] = useState(false);

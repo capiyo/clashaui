@@ -4,7 +4,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Posts from "./Posts";
 import GamesCard from "../Home/Games/GamesCard";
 
-type TabType = "posts" | "games" | "live";
+type TabType = "posts" | "games" | "pledges";
 
 interface TabConfig {
   id: TabType;
@@ -15,13 +15,11 @@ interface TabConfig {
 const tabs: TabConfig[] = [
   { id: "posts", label: "Posts", icon: <FileText className="w-4 h-4" /> },
   { id: "games", label: "Games", icon: <Gamepad2 className="w-4 h-4" /> },
-  { id: "live", label: "Live", icon: <Radio className="w-4 h-4" /> },
+  { id: "pledges", label: "Pledges", icon: <Radio className="w-4 h-4" /> },
 ];
 
 export const BottomNavigation = () => {
   const [activeTab, setActiveTab] = useState<TabType>("posts");
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
 
   const getIndicatorPosition = () => {
     const index = tabs.findIndex((tab) => tab.id === activeTab);
@@ -33,43 +31,12 @@ export const BottomNavigation = () => {
     return `-${index * 100}%`;
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStart - touchEnd > 75) {
-      // Swiped left
-      const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
-      if (currentIndex < tabs.length - 1) {
-        setActiveTab(tabs[currentIndex + 1].id);
-      }
-    }
-
-    if (touchStart - touchEnd < -75) {
-      // Swiped right
-      const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
-      if (currentIndex > 0) {
-        setActiveTab(tabs[currentIndex - 1].id);
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 overflow-hidden pb-5"> {/* Added padding-bottom to prevent content from being hidden behind absolute nav */}
+      <div className="flex-1 overflow-hidden pb-5">
         <div className="max-w-4xl mx-auto h-full">
-          {/* Main Content Area with Sliding Effect */}
-          <div 
-            className="overflow-hidden h-full"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
+          {/* Main Content Area - Removed touch handlers */}
+          <div className="overflow-hidden h-full">
             <div 
               className="flex h-full transition-transform duration-300 ease-out"
               style={{ transform: `translateX(${getContentOffset()})` }}
