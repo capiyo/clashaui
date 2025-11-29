@@ -27,6 +27,18 @@ interface GamesCardProps {
   league: string;
 }
 
+interface PledgeData {
+  amount: number;
+  away_team: string;
+  home_team: string;
+  selection: string;
+  fan: string;
+  username: string;
+  phone: string;
+}
+
+
+
 const GamesCard = () => {
   const [myId, setMyId] = useState("");
   const [myName, setMyname] = useState("");
@@ -235,6 +247,71 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
   const [followerCount, setFollowerCount] = useState(Math.floor(Math.random() * 500) + 200);
   const { toast } = useToast();
 
+
+
+
+
+const sendPledges = async (
+  amount: number, 
+  selectedOption: string, 
+  away_team: string, 
+  home_team: string
+): Promise<void> => {
+  const data: PledgeData = {
+    amount: 4000,
+    away_team: away_team,
+    home_team: home_team,
+    selection: selectedOption,
+    fan: "Man United",
+    username: "capiyo",
+    phone: "0704306867"
+  };
+
+  try {
+    console.log("Sending pledge data...");
+    console.log(data)
+    
+    const response = await fetch('https://clashaapi.onrender.com/api//pledges', {    
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Pledge sent successfully:", result);
+    
+  } catch (error) {
+    console.error("Error sending pledge:", error);
+    // You might want to handle the error differently here
+    // e.g., show a notification to the user
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const handlePledge = () => {
     if (!selectedOption || !amount) {
       toast({
@@ -352,7 +429,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                   onClick={() => handleTeamSelect("homeTeam")}
                 >
                   <div className={cn(
-                    "relative p-3 rounded-xl transition-all duration-300 border-2",
+                    "relative p-3 rounded-full transition-all duration-300 border-2",
                     selectedOption === "homeTeam" 
                       ? "bg-gradient-to-br from-cyan-50 to-cyan-100/50 border-cyan-300 shadow-md" 
                       : "border-transparent hover:border-cyan-200 hover:bg-cyan-50/30 group-hover/team:scale-105"
@@ -417,7 +494,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                   onClick={() => handleTeamSelect("awayTeam")}
                 >
                   <div className={cn(
-                    "relative p-3 rounded-xl transition-all duration-300 border-2",
+                    "relative p-3 rounded-full transition-all duration-300 border-2",
                     selectedOption === "awayTeam" 
                       ? "bg-gradient-to-br from-cyan-50 to-cyan-100/50 border-cyan-300 shadow-md" 
                       : "border-transparent hover:border-cyan-200 hover:bg-cyan-50/30 group-hover/team:scale-105"
@@ -484,7 +561,7 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
               <div className="space-y-2 animate-in fade-in duration-300">
                 <label className="text-cyan-800 text-sm font-semibold flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-cyan-600" />
-                  Enter Bet Amount (₿)
+                  Enter Bet Amount (Ksh.)
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -595,9 +672,11 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
 
             {/* Bet Button - Enhanced Cyan Gradient */}
             <div className="pt-1">
-              <Sheet open={isPledging} onOpenChange={setIsPledging}>
-                <SheetTrigger asChild>
+              <div>
+                <div  >
                   <Button
+                   onClick={()=>sendPledges(amount,selectedOption,games.home_team,games.away_team,games.date)}
+                   
                     className={cn(
                       "w-full transition-all duration-300 text-sm h-11 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden",
                       selectedOption && amount
@@ -611,66 +690,9 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
                     <Zap className="w-4 h-4 mr-2" />
                     {!selectedOption ? "Select a Team First" : !amount ? "Enter Amount" : `Place Bet of ₿${amount}`}
                   </Button>
-                </SheetTrigger>
-                <SheetContent className="bg-gradient-to-br from-white to-cyan-50/30 border-l border-cyan-100 w-full max-w-md backdrop-blur-sm">
-                  <SheetHeader>
-                    <SheetTitle className="text-cyan-800 text-lg flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-cyan-600" />
-                      Confirm Your Bet
-                    </SheetTitle>
-                    <SheetDescription className="text-cyan-600">
-                      Review your bet before placing
-                    </SheetDescription>
-                  </SheetHeader>
-                  
-                  <div className="space-y-6 mt-6">
-                    {/* Match Info */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-200 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-center flex-1">
-                          <p className="text-sm font-semibold text-cyan-800">{games.home_team}</p>
-                          <p className="text-cyan-600 text-lg font-bold">{games.home_win}</p>
-                        </div>
-                        <div className="mx-4 text-cyan-500 font-bold">VS</div>
-                        <div className="text-center flex-1">
-                          <p className="text-sm font-semibold text-cyan-800">{games.away_team}</p>
-                          <p className="text-cyan-600 text-lg font-bold">{games.away_win}</p>
-                        </div>
-                      </div>
-                      <div className="text-center pt-2 border-t border-cyan-200">
-                        <p className="text-xs text-cyan-600">Draw Odds</p>
-                        <p className="text-cyan-600 font-bold">{games.draw}</p>
-                      </div>
-                    </div>
-
-                    {/* Bet Summary */}
-                    <div className="bg-gradient-to-r from-cyan-50 to-cyan-100 border border-cyan-200 rounded-lg p-4 shadow-sm">
-                      <p className="text-cyan-800 text-sm font-semibold text-center">
-                        You're betting <span className="font-bold text-cyan-700">₿{amount}</span> on{" "}
-                        <span className="font-bold text-cyan-700">
-                          {selectedOption === "homeTeam" 
-                            ? games.home_team 
-                            : selectedOption === "awayTeam" 
-                            ? games.away_team 
-                            : "Draw"}
-                        </span>
-                      </p>
-                      <p className="text-cyan-600 text-xs text-center mt-1">
-                        Odds: {getSelectedOdds()} • Potential Payout: ₿{calculatePayout()}
-                      </p>
-                    </div>
-
-                    {/* Confirm Button */}
-                    <Button
-                      onClick={handlePledge}
-                      size="lg"
-                      className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white border-0 rounded-lg py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      🎯 Confirm Bet
-                    </Button>
-                  </div>
-                </SheetContent>
-              </Sheet>
+                </div>
+               
+              </div>
             </div>
 
             {/* Additional Stats - Cyan Theme */}
