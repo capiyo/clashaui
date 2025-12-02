@@ -2,7 +2,7 @@ import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 
-const API_BASE_URL = 'https://clashaapi.onrender.com';
+const API_BASE_URL = 'https://fanclash-api.onrender.com';
 //const local_BASE_URL = 'http://localhost:3000';
 
 interface Post {
