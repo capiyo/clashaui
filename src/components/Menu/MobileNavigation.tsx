@@ -129,30 +129,28 @@ const MobileNavigation = () => {
         const drawerContent = getDrawerContent(item.id);
         
         return (
-          <Sheet
+         // In MobileNavigation.tsx - Update SheetContent
+<Sheet
   key={item.id}
   open={activeDrawer === item.id}
   onOpenChange={(open) => !open && handleChange(null)}
 >
   <SheetContent 
-    className="h-screen bottom-0 mt-[400px] lg:mr-[300px] transition-transform duration-500 ease-out w-[400px] rounded-lg right-0 p-0" 
-    side="right"
+    className="h-screen bottom-20 lg:mt-[400px]  mt-[200px] lg:mr-[300px] transition-transform duration-500 ease-out lg:w-[400px] rounded-xl  w-screen rounded-lg right-0 flex flex-col p-0"
   >
-    {/* Scrollable Content Wrapper */}
-    <div className="flex flex-col h-full">
-      <SheetHeader className="px-6 pt-6 pb-4 border-b border-cyan-100/50 flex-shrink-0">
+    {/* Sticky Header */}
+    <div className="sticky top-0 z-10 bg-white border-b border-cyan-100 px-1 py-1 flex-shrink-0">
+      <SheetHeader className="p-0">
         <SheetTitle className="text-cyan-900">{drawerContent.title}</SheetTitle>
         <SheetDescription className="text-cyan-600/70">
           {drawerContent.description}
         </SheetDescription>
       </SheetHeader>
-      
-      {/* Scrollable Area */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-6">
-          {drawerContent.content}
-        </div>
-      </div>
+    </div>
+    
+    {/* Scrollable Content Area */}
+    <div className="flex-1 overflow-y-auto p-6">
+      {drawerContent.content}
     </div>
   </SheetContent>
 </Sheet>
