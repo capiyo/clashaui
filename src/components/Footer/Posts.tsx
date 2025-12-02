@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 
 const API_BASE_URL = 'https://clashaapi.onrender.com';
+//const local_BASE_URL = 'http://localhost:3000';
 
 interface Post {
   id: string;
@@ -319,7 +320,7 @@ const Posts = () => {
           <div className="bg-white/80 backdrop-blur-sm border-t border-cyan-100/50 p-4 sticky bottom-0">
             <button
               onClick={fetchPosts}
-              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-200 shadow-sm"
+              className="w-full  hover:bg-cyan-600 text-white py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-200 shadow-sm"
             >
               <RefreshCw className="h-3 w-3" />
               Load New Posts

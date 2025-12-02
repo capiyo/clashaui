@@ -31,3 +31,10 @@
                   </div>
                 </SheetContent>
   </div>
+
+
+
+
+  // mysql commands   34.31.228.57
+ // mysql --ssl-mode=REQUIRED --host=34.31.228.57 --user=root --password
+ //git remote set-url origin git@github.com:capiyo/repository.git

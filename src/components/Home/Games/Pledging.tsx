@@ -27,7 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Pledging = () => {
 
-  const url="https://clashaapi.onrender.com"
+  const url="https://fanclash-api.onrender.com"
 
 
 

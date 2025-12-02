@@ -3,13 +3,13 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import Addpost from "./Footer/Addpost";
-import Pending from "./Footer/Pledges";
+import Pending from "./Footer/PledgeCard";
 import {useDispatch,useSelector} from 'react-redux'
 import { Chats } from "./Footer/ChatList";
 import { Button } from "@/components/ui/button";
 import { Menu } from 'lucide-react';
 //import SwipeableViews from 'react-swipeable-views';
-import Pledges from "./Footer/Pledges";
+import Pledges from "./Footer/PledgeCard";
 import {
   Sheet,
   SheetContent,

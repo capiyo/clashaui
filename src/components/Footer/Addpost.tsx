@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 import { Image as ImageIcon, Send, X } from "lucide-react";
 
-const API_BASE_URL = 'https://clashaapi.onrender.com';
+const API_BASE_URL = 'https://fanclash-api.onrender.com';
+//const local_BASE_URL = 'http://localhost:3000';
+
 
 
 const AddPost = () => {

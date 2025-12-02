@@ -46,7 +46,7 @@ const GamesCard = () => {
   const [games, setGames] = useState<GamesCardProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const API_BASE_URL = 'https://clashaapi.onrender.com/api/games';
+  const API_BASE_URL = 'https://fanclash-api.onrender.com/api/games';
 
   const { toast } = useToast();
 
@@ -246,7 +246,8 @@ function GameCardCyan({ games, teamAvatars, mockUsers }: { games: GamesCardProps
   const [commentCount, setCommentCount] = useState(Math.floor(Math.random() * 30) + 10);
   const [followerCount, setFollowerCount] = useState(Math.floor(Math.random() * 500) + 200);
   const { toast } = useToast();
-
+  const local_BASE_URL = 'https://fanclash-api.onrender.com';
+  //https://clashaapi.onrender.com
 
 
 
@@ -258,7 +259,7 @@ const sendPledges = async (
   home_team: string
 ): Promise<void> => {
   const data: PledgeData = {
-    amount: 4000,
+    amount: 4000.0,
     away_team: away_team,
     home_team: home_team,
     selection: selectedOption,
@@ -271,7 +272,7 @@ const sendPledges = async (
     console.log("Sending pledge data...");
     console.log(data)
     
-    const response = await fetch('https://clashaapi.onrender.com/api//pledges', {    
+    const response = await fetch(`${local_BASE_URL}/api/pledges`, {    
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

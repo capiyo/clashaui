@@ -3,6 +3,7 @@ import { Gamepad2, Radio, FileText } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Posts from "./Posts";
 import GamesCard from "../Home/Games/GamesCard";
+import PledgeCard from "./PledgeCard";
 
 type TabType = "posts" | "games" | "pledges";
 
@@ -53,7 +54,7 @@ export const BottomNavigation = () => {
 
               {/* Live Section */}
               <div className="w-full flex-shrink-0 overflow-y-auto h-full">
-                <GamesCard/>
+                <PledgeCard/>
               </div>
             </div>
           </div>
