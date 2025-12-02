@@ -130,21 +130,32 @@ const MobileNavigation = () => {
         
         return (
           <Sheet
-            key={item.id}
-            open={activeDrawer === item.id}
-            onOpenChange={(open) => !open && handleChange(null)}
-          >
-            <SheetContent 
-              className="h-screen bottom-0 mt-[400px] lg:mr-[300px] transition-transform duration-500 ease-out w-[400px] rounded-lg right-0" 
-              side="right"
-            >
-              <SheetHeader>
-                <SheetTitle>{drawerContent.title}</SheetTitle>
-                <SheetDescription>{drawerContent.description}</SheetDescription>
-              </SheetHeader>
-              {drawerContent.content}
-            </SheetContent>
-          </Sheet>
+  key={item.id}
+  open={activeDrawer === item.id}
+  onOpenChange={(open) => !open && handleChange(null)}
+>
+  <SheetContent 
+    className="h-screen bottom-0 mt-[400px] lg:mr-[300px] transition-transform duration-500 ease-out w-[400px] rounded-lg right-0 p-0" 
+    side="right"
+  >
+    {/* Scrollable Content Wrapper */}
+    <div className="flex flex-col h-full">
+      <SheetHeader className="px-6 pt-6 pb-4 border-b border-cyan-100/50 flex-shrink-0">
+        <SheetTitle className="text-cyan-900">{drawerContent.title}</SheetTitle>
+        <SheetDescription className="text-cyan-600/70">
+          {drawerContent.description}
+        </SheetDescription>
+      </SheetHeader>
+      
+      {/* Scrollable Area */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6">
+          {drawerContent.content}
+        </div>
+      </div>
+    </div>
+  </SheetContent>
+</Sheet>
         );
       })}
     </div>
