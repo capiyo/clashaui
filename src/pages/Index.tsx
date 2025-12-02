@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 
-import MobileNavigation from "@/components/MobileNavigation";
+import MobileNavigation from "@/components/Menu/MobileNavigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
