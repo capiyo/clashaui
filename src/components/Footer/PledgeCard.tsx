@@ -53,7 +53,7 @@ const PledgeCard = () => {
   const [pledges, setPledges] = useState<PledgeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const API_BASE_URL = 'https://fanclash-api.onrender.com';
+  const API_BASE_URL = 'https://fanclash-api.onrender.com/api/pledges';
 
   const { toast } = useToast();
 
