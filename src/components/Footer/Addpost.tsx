@@ -6,6 +6,7 @@ const API_BASE_URL = 'https://fanclash-api.onrender.com';
 const AddPost = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [caption, setCaption] = useState<string>("");
+  
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");

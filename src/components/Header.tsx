@@ -207,7 +207,7 @@ const Header = () => {
                 ''
               )}
               <div className='justify-center'>
-                <Login />
+                
               </div>
             </Drawer>
           </div>

@@ -1,9 +1,8 @@
-import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw, ImageIcon } from "lucide-react";
+import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Clock, RefreshCw, ImageIcon, Trophy, Flame, TrendingUp, Users, Target, Coins, Zap, Award } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 
 const API_BASE_URL = 'https://fanclash-api.onrender.com';
-//const local_BASE_URL = 'http://localhost:3000';
 
 interface Post {
   id: string;
@@ -13,6 +12,9 @@ interface Post {
   user_id: string;
   created_at: number;
   updated_at?: number;
+  bet_amount?: number;
+  bet_outcome?: 'win' | 'loss' | 'pending';
+  odds?: string;
 }
 
 interface ApiResponse {
@@ -27,6 +29,7 @@ const Posts = () => {
   const [error, setError] = useState<string>("");
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set());
+  const [activeFilter, setActiveFilter] = useState<'all' | 'wins' | 'hot'>('all');
 
   useEffect(() => {
     fetchPosts();
@@ -56,7 +59,10 @@ const Posts = () => {
       if (data.success && Array.isArray(data.posts)) {
         const cleanedPosts = data.posts.map(post => ({
           ...post,
-          image_url: cleanImageUrl(post.image_url)
+          image_url: cleanImageUrl(post.image_url),
+          bet_amount: post.bet_amount || Math.floor(Math.random() * 500) + 10,
+          bet_outcome: post.bet_outcome || (Math.random() > 0.5 ? 'win' : Math.random() > 0.3 ? 'loss' : 'pending'),
+          odds: post.odds || `${(Math.random() * 5 + 1.1).toFixed(2)}`
         }));
         
         setPosts(cleanedPosts);
@@ -101,21 +107,6 @@ const Posts = () => {
     }
     
     return `${API_BASE_URL}/${cleanedUrl}`;
-  };
-
-  const hasValidImage = (imageUrl: string): boolean => {
-    if (!imageUrl || imageUrl.trim() === '') return false;
-    
-    const invalidValues = ['null', 'undefined', 'nan', 'none', 'false', 'true'];
-    if (invalidValues.includes(imageUrl.toLowerCase())) return false;
-    
-    if (imageUrl.includes('placeholder') || 
-        imageUrl.includes('default') || 
-        imageUrl.includes('missing')) {
-      return false;
-    }
-    
-    return true;
   };
 
   const handleLike = (postId: string): void => {
@@ -167,47 +158,89 @@ const Posts = () => {
       .slice(0, 2);
   };
 
+  const getOutcomeColor = (outcome: string) => {
+    switch(outcome) {
+      case 'win': return 'text-emerald-400 bg-emerald-900/30 border-emerald-700/50';
+      case 'loss': return 'text-red-400 bg-red-900/30 border-red-700/50';
+      default: return 'text-yellow-400 bg-yellow-900/30 border-yellow-700/50';
+    }
+  };
+
+  const getOutcomeIcon = (outcome: string) => {
+    switch(outcome) {
+      case 'win': return <Trophy className="h-3 w-3" />;
+      case 'loss': return <TrendingUp className="h-3 w-3" />;
+      default: return <Clock className="h-3 w-3" />;
+    }
+  };
+
   const useMockData = (): void => {
     const mockPosts: Post[] = [
       {
         id: '1',
-        image_url: 'https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=500&h=500&fit=crop',
-        caption: 'Beautiful sunset at the beach! 🌅 The colors were absolutely breathtaking today. Feeling grateful for these moments. #sunset #beach #nature #grateful',
-        user_name: 'John Doe',
+        image_url: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&h=600&fit=crop',
+        caption: 'HUGE WIN! 🏆 Just won ₿250 on Liverpool vs Man City! The 2-1 comeback was insane! 💪 #betting #sportsbetting #win #football',
+        user_name: 'Alex Betmaster',
         user_id: 'user123',
         created_at: Math.floor(Date.now() / 1000) - 2 * 60 * 60,
+        bet_amount: 250,
+        bet_outcome: 'win',
+        odds: '3.25'
       },
       {
         id: '2',
         image_url: '', // Text-only post
-        caption: 'Exploring the mountains today! 🏔️ Fresh air and amazing views make every step worth it. Sometimes the best moments are the ones without cameras. #adventure #mountains #hiking #mindfulness',
-        user_name: 'Jane Smith',
+        caption: 'Live betting on NBA playoffs! 🏀 Taking Lakers ML @ 2.10 odds. Lebron going for 40+ tonight! #NBA #livebetting #basketball #sportsbook',
+        user_name: 'Sarah Sportsfan',
         user_id: 'user456',
         created_at: Math.floor(Date.now() / 1000) - 5 * 60 * 60,
+        bet_amount: 100,
+        bet_outcome: 'pending',
+        odds: '2.10'
       },
       {
         id: '3',
-        image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&h=500&fit=crop',
-        caption: 'Fashion week vibes! 👗✨ So inspired by all the creativity around. #fashion #style #ootd',
-        user_name: 'Emma Wilson',
+        image_url: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&h=600&fit=crop',
+        caption: 'Tough loss on the Derby today... 🤦‍♂️ Thought Horse #3 was a lock! Back to analyzing form for tomorrow. #horseracing #betting #sports #analysis',
+        user_name: 'Mike Tipster',
         user_id: 'user789',
         created_at: Math.floor(Date.now() / 1000) - 8 * 60 * 60,
+        bet_amount: 75,
+        bet_outcome: 'loss',
+        odds: '4.50'
       },
       {
         id: '4',
         image_url: '', // Another text-only post
-        caption: 'Just finished an amazing book! 📚 Sometimes the best adventures are the ones we experience through words. What are you reading lately? #books #reading #inspiration',
-        user_name: 'Mike Johnson',
+        caption: '🔥 HOT TIP: Chelsea vs Arsenal - Over 2.5 goals @ 1.80 Both teams scoring like crazy lately! #premierleague #football #bettips #soccer',
+        user_name: 'Emma Analyst',
         user_id: 'user101',
         created_at: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+        bet_amount: 200,
+        bet_outcome: 'pending',
+        odds: '1.80'
       },
       {
         id: '5',
-        image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&h=500&fit=crop',
-        caption: 'Healthy breakfast to start the day right! 🥑🍳 #healthy #food #breakfast #nutrition',
-        user_name: 'Sarah Chen',
+        image_url: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=800&h=600&fit=crop',
+        caption: 'My betting strategy for March Madness! 🏀 Going with underdog picks and live betting. Who else is ready for the tournament? #marchmadness #collegebasketball #bettingstrategy',
+        user_name: 'Chris Gambler',
         user_id: 'user102',
         created_at: Math.floor(Date.now() / 1000) - 1 * 60 * 60,
+        bet_amount: 150,
+        bet_outcome: 'win',
+        odds: '5.25'
+      },
+      {
+        id: '6',
+        image_url: 'https://images.unsplash.com/photo-1521412644187-c49fa049e84d?w=800&h=600&fit=crop',
+        caption: 'Parlay hit! 🎯 4-leg accumulator came through with ₿425 profit! Feeling unstoppable right now! #parlay #accumulator #winning #betting',
+        user_name: 'Jordan Winner',
+        user_id: 'user103',
+        created_at: Math.floor(Date.now() / 1000) - 3 * 60 * 60,
+        bet_amount: 50,
+        bet_outcome: 'win',
+        odds: '9.50'
       },
     ];
     
@@ -221,30 +254,39 @@ const Posts = () => {
     setLoading(false);
   };
 
+  const filteredPosts = posts.filter(post => {
+    if (activeFilter === 'wins') return post.bet_outcome === 'win';
+    if (activeFilter === 'hot') {
+      const likes = Math.floor(Math.random() * 100) + 50;
+      return likes > 80 || post.bet_outcome === 'win';
+    }
+    return true;
+  });
+
   if (loading) {
     return (
-      <div className="h-screen bg-gradient-to-br from-cyan-50 to-white overflow-y-auto">
+      <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-emerald-950 overflow-y-auto">
         <div className="max-w-2xl mx-auto">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white/80 backdrop-blur-sm border-b border-cyan-100/50 animate-pulse">
+            <div key={i} className="bg-gradient-to-br from-gray-900/80 to-gray-950/80 border-b border-emerald-800/30 animate-pulse">
               <div className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-cyan-200 rounded-full"></div>
+                  <div className="w-8 h-8 bg-emerald-900/50 rounded-full"></div>
                   <div className="space-y-1 flex-1">
-                    <div className="w-20 h-3 bg-cyan-200 rounded"></div>
-                    <div className="w-16 h-2 bg-cyan-100 rounded"></div>
+                    <div className="w-20 h-3 bg-emerald-900/50 rounded"></div>
+                    <div className="w-16 h-2 bg-emerald-900/30 rounded"></div>
                   </div>
                 </div>
               </div>
-              <div className="w-full h-80 bg-cyan-200/50"></div>
+              <div className="w-full h-80 bg-emerald-900/20"></div>
               <div className="p-4 space-y-3">
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 bg-cyan-200 rounded"></div>
-                  <div className="w-6 h-6 bg-cyan-200 rounded"></div>
-                  <div className="w-6 h-6 bg-cyan-200 rounded"></div>
+                  <div className="w-6 h-6 bg-emerald-900/50 rounded"></div>
+                  <div className="w-6 h-6 bg-emerald-900/50 rounded"></div>
+                  <div className="w-6 h-6 bg-emerald-900/50 rounded"></div>
                 </div>
-                <div className="w-3/4 h-3 bg-cyan-200 rounded"></div>
-                <div className="w-1/2 h-2 bg-cyan-100 rounded"></div>
+                <div className="w-3/4 h-3 bg-emerald-900/50 rounded"></div>
+                <div className="w-1/2 h-2 bg-emerald-900/30 rounded"></div>
               </div>
             </div>
           ))}
@@ -255,25 +297,27 @@ const Posts = () => {
 
   if (error) {
     return (
-      <div className="h-screen bg-gradient-to-br from-cyan-50 to-white flex items-center justify-center">
+      <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-emerald-950 flex items-center justify-center">
         <div className="text-center max-w-sm w-full">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-cyan-200/50 shadow-sm">
-            <div className="text-cyan-400 mb-3 text-4xl">📷</div>
-            <h3 className="text-cyan-800 font-semibold text-sm mb-2">Failed to load posts</h3>
-            <p className="text-cyan-600 mb-4 text-xs">{error}</p>
-            <div className="space-y-2">
+          <div className="bg-gradient-to-br from-gray-900/90 to-gray-950/90 backdrop-blur-sm rounded-2xl p-8 border border-emerald-800/50 shadow-2xl">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-900/30 to-gray-900/30 flex items-center justify-center border border-emerald-800/50">
+              <Trophy className="h-10 w-10 text-emerald-400" />
+            </div>
+            <h3 className="text-white font-bold text-lg mb-2">Connection Failed</h3>
+            <p className="text-gray-400 mb-6 text-sm">Unable to load betting posts</p>
+            <div className="space-y-3">
               <button
                 onClick={fetchPosts}
-                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
+                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-bold transition-all duration-200 shadow-lg"
               >
-                <RefreshCw className="h-3 w-3" />
-                Try Again
+                <RefreshCw className="h-4 w-4" />
+                Retry Connection
               </button>
               <button
                 onClick={useMockData}
-                className="w-full bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-4 py-2 rounded-xl border border-cyan-300/50 text-xs transition-all duration-200"
+                className="w-full bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-300 px-4 py-3 rounded-xl border border-emerald-800/50 text-sm transition-all duration-200"
               >
-                Use Demo Data
+                Load Demo Posts
               </button>
             </div>
           </div>
@@ -283,11 +327,42 @@ const Posts = () => {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-cyan-50 to-white overflow-y-auto">
+    <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-emerald-950 overflow-y-auto">
+      {/* Header Stats */}
+      <div className="max-w-2xl mx-auto pt-4 px-4">
+       
+
+        
+        {/* Community Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="bg-gradient-to-br from-emerald-900/30 to-gray-900/30 rounded-xl p-3 border border-emerald-800/30">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-emerald-400" />
+              <span className="text-gray-400 text-xs">Bettors</span>
+            </div>
+            <p className="text-white text-lg font-bold mt-1">2.4K</p>
+          </div>
+          <div className="bg-gradient-to-br from-emerald-900/30 to-gray-900/30 rounded-xl p-3 border border-emerald-800/30">
+            <div className="flex items-center gap-2">
+              <Award className="h-4 w-4 text-emerald-400" />
+              <span className="text-gray-400 text-xs">Today's Wins</span>
+            </div>
+            <p className="text-white text-lg font-bold mt-1">₿42.5K</p>
+          </div>
+          <div className="bg-gradient-to-br from-emerald-900/30 to-gray-900/30 rounded-xl p-3 border border-emerald-800/30">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-emerald-400" />
+              <span className="text-gray-400 text-xs">Tips Shared</span>
+            </div>
+            <p className="text-white text-lg font-bold mt-1">156</p>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-2xl mx-auto">
         <div className="space-y-0">
-          {posts.map((post) => (
-            <PostCard
+          {filteredPosts.map((post) => (
+            <BettingPostCard
               key={post.id}
               post={post}
               isLiked={likedPosts.has(post.id)}
@@ -296,19 +371,23 @@ const Posts = () => {
               onSave={handleSave}
               formatTimeAgo={formatTimeAgo}
               getInitials={getInitials}
+              getOutcomeColor={getOutcomeColor}
+              getOutcomeIcon={getOutcomeIcon}
             />
           ))}
         </div>
 
-        {posts.length === 0 && (
-          <div className="bg-white/80 backdrop-blur-sm border-b border-cyan-100/50 p-8">
+        {filteredPosts.length === 0 && (
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-950/80 border-b border-emerald-800/30 p-10">
             <div className="text-center">
-              <div className="text-cyan-400 mb-3 text-5xl">📷</div>
-              <h3 className="text-cyan-800 font-semibold text-sm mb-2">No posts yet</h3>
-              <p className="text-cyan-600 mb-4 text-xs">Be the first to share a moment!</p>
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-900/20 to-gray-900/20 flex items-center justify-center border border-emerald-800/30">
+                <MessageCircle className="h-12 w-12 text-emerald-400" />
+              </div>
+              <h3 className="text-white font-bold text-lg mb-2">No betting posts yet</h3>
+              <p className="text-gray-400 mb-6 text-sm">Be the first to share a betting tip or win!</p>
               <button
                 onClick={useMockData}
-                className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 shadow-sm"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg"
               >
                 Load Demo Posts
               </button>
@@ -316,13 +395,13 @@ const Posts = () => {
           </div>
         )}
 
-        {posts.length > 0 && (
-          <div className="bg-white/80 backdrop-blur-sm border-t border-cyan-100/50 p-4 sticky bottom-0">
+        {filteredPosts.length > 0 && (
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-950/80 border-t border-emerald-800/30 p-4 sticky bottom-0 backdrop-blur-sm">
             <button
               onClick={fetchPosts}
-              className="w-full  hover:bg-cyan-600 text-white py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-200 shadow-sm"
+              className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm font-bold transition-all duration-200 shadow-lg"
             >
-              <RefreshCw className="h-3 w-3" />
+              <RefreshCw className="h-4 w-4" />
               Load New Posts
             </button>
           </div>
@@ -332,8 +411,8 @@ const Posts = () => {
   );
 };
 
-// Post Card Component
-interface PostCardProps {
+// Betting Post Card Component
+interface BettingPostCardProps {
   post: Post;
   isLiked: boolean;
   isSaved: boolean;
@@ -341,9 +420,11 @@ interface PostCardProps {
   onSave: (postId: string) => void;
   formatTimeAgo: (timestamp: number) => string;
   getInitials: (name: string) => string;
+  getOutcomeColor: (outcome: string) => string;
+  getOutcomeIcon: (outcome: string) => JSX.Element;
 }
 
-const PostCard: React.FC<PostCardProps> = ({
+const BettingPostCard: React.FC<BettingPostCardProps> = ({
   post,
   isLiked,
   isSaved,
@@ -351,6 +432,8 @@ const PostCard: React.FC<PostCardProps> = ({
   onSave,
   formatTimeAgo,
   getInitials,
+  getOutcomeColor,
+  getOutcomeIcon,
 }) => {
   const [showFullCaption, setShowFullCaption] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
@@ -385,22 +468,35 @@ const PostCard: React.FC<PostCardProps> = ({
     setImageLoaded(true);
   };
 
+  const calculatePotentialWin = () => {
+    if (post.bet_amount && post.odds) {
+      return (post.bet_amount * parseFloat(post.odds)).toFixed(2);
+    }
+    return '0.00';
+  };
+
   return (
-    <div className="bg-white/80 backdrop-blur-sm border-b border-cyan-100/50">
+    <div className="bg-gradient-to-br from-gray-900/80 to-gray-950/80 border-b border-emerald-800/30">
       {/* Header */}
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="w-9 h-9 border border-cyan-300/50 shadow-sm">
-              <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white text-xs">
+            <Avatar className="w-10 h-10 border border-emerald-700/50 shadow-lg">
+              <AvatarFallback className="bg-gradient-to-br from-emerald-700 to-emerald-800 text-white text-sm font-bold">
                 {getInitials(post.user_name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-semibold text-cyan-900 text-sm">
-                {post.user_name}
-              </h3>
-              <div className="flex items-center gap-1 text-cyan-600/70">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-bold text-white text-sm">
+                  {post.user_name}
+                </h3>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium border flex items-center gap-1 ${getOutcomeColor(post.bet_outcome || 'pending')}`}>
+                  {getOutcomeIcon(post.bet_outcome || 'pending')}
+                  {post.bet_outcome?.toUpperCase() || 'PENDING'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-gray-400">
                 <Clock className="h-3 w-3" />
                 <span className="text-xs">
                   {formatTimeAgo(post.created_at)}
@@ -408,27 +504,62 @@ const PostCard: React.FC<PostCardProps> = ({
               </div>
             </div>
           </div>
-          <button className="text-cyan-600/60 hover:text-cyan-700 p-1 rounded-lg transition-colors">
+          <button className="text-gray-400 hover:text-white p-1.5 rounded-lg transition-colors hover:bg-gray-800/50">
             <MoreHorizontal className="h-4 w-4" />
           </button>
         </div>
       </div>
 
+      {/* Bet Info Banner */}
+      <div className="px-4 pb-3">
+        <div className="bg-gradient-to-r from-emerald-900/20 to-gray-900/20 rounded-xl p-3 border border-emerald-800/30">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-400 text-xs font-medium mb-1">BET DETAILS</p>
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-emerald-300 text-sm font-bold">₿{post.bet_amount}</p>
+                  <p className="text-gray-400 text-xs">Stake</p>
+                </div>
+                <div className="h-4 w-px bg-emerald-800/50"></div>
+                <div>
+                  <p className="text-white text-sm font-bold">{post.odds}</p>
+                  <p className="text-gray-400 text-xs">Odds</p>
+                </div>
+                <div className="h-4 w-px bg-emerald-800/50"></div>
+                <div>
+                  <p className="text-emerald-400 text-sm font-bold">₿{calculatePotentialWin()}</p>
+                  <p className="text-gray-400 text-xs">Potential</p>
+                </div>
+              </div>
+            </div>
+            {post.bet_outcome === 'win' && (
+              <div className="bg-gradient-to-br from-emerald-600/20 to-emerald-800/20 px-3 py-2 rounded-lg border border-emerald-700/50">
+                <div className="flex items-center gap-1">
+                  <Coins className="h-4 w-4 text-emerald-400" />
+                  <span className="text-emerald-300 text-sm font-bold">+₿{((post.bet_amount || 0) * (parseFloat(post.odds || '1') - 1)).toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Image Section */}
       {hasValidImage && !imageError && (
-        <div className="relative bg-gradient-to-br from-cyan-50/50 to-cyan-100/30">
+        <div className="relative bg-gradient-to-br from-emerald-900/10 to-gray-900/10">
           {!imageLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-cyan-50/30">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-8 h-8 border-2 border-cyan-200 border-t-cyan-400 rounded-full animate-spin"></div>
-                <p className="text-cyan-600/60 text-xs">Loading image...</p>
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/20">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-10 h-10 border-2 border-emerald-800/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                <p className="text-gray-500 text-xs">Loading image...</p>
               </div>
             </div>
           )}
           
           <img
             src={post.image_url}
-            alt={post.caption || `Post by ${post.user_name}`}
+            alt={post.caption || `Betting post by ${post.user_name}`}
             className={`w-full object-cover transition-all duration-500 ${
               imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
             }`}
@@ -445,20 +576,20 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Content */}
-      <div className="p-1">
+      <div className="p-4">
         {/* Text-only post indicator */}
         {isTextOnly && (
-          <div className="flex items-center gap-2  text-cyan-600/60">
-            <ImageIcon className="h-4 w-4" />
-            <span className="text-xs font-medium">Text Post</span>
+          <div className="flex items-center gap-2 text-emerald-400 mb-3">
+            <Zap className="h-4 w-4" />
+            <span className="text-xs font-bold">BETTING TIP</span>
           </div>
         )}
 
         {/* Caption */}
         {post.caption && (
-          <div className="mb-3">
-            <p className="text-cyan-800 text-sm leading-relaxed">
-              <span className="font-semibold">{post.user_name}</span>{' '}
+          <div className="mb-4">
+            <p className="text-gray-300 text-sm leading-relaxed">
+              <span className="font-bold text-white">{post.user_name}</span>{' '}
               {shouldTruncate && !showFullCaption 
                 ? `${post.caption.slice(0, 120)}...`
                 : post.caption
@@ -466,7 +597,7 @@ const PostCard: React.FC<PostCardProps> = ({
               {shouldTruncate && (
                 <button
                   onClick={() => setShowFullCaption(!showFullCaption)}
-                  className="ml-2 text-cyan-500 hover:text-cyan-600 font-medium text-sm transition-colors"
+                  className="ml-2 text-emerald-400 hover:text-emerald-300 font-bold text-sm transition-colors"
                 >
                   {showFullCaption ? 'Show less' : 'Show more'}
                 </button>
@@ -476,23 +607,23 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {/* Actions */}
-        <div className="">
+        <div className="mb-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => onLike(post.id)}
                 className={`p-1.5 transition-all duration-200 ${
                   isLiked 
-                    ? 'text-red-500 scale-110' 
-                    : 'text-cyan-600/70 hover:text-red-500'
+                    ? 'text-red-400 scale-110 bg-red-900/20 rounded-full' 
+                    : 'text-gray-400 hover:text-red-400 hover:bg-gray-800/50 rounded-full'
                 }`}
               >
                 <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
               </button>
-              <button className="text-cyan-600/70 hover:text-cyan-700 p-1.5 transition-colors">
+              <button className="text-gray-400 hover:text-emerald-400 p-1.5 hover:bg-gray-800/50 rounded-full transition-all">
                 <MessageCircle className="h-5 w-5" />
               </button>
-              <button className="text-cyan-600/70 hover:text-cyan-700 p-1.5 transition-colors">
+              <button className="text-gray-400 hover:text-emerald-400 p-1.5 hover:bg-gray-800/50 rounded-full transition-all">
                 <Share className="h-5 w-5" />
               </button>
             </div>
@@ -500,8 +631,8 @@ const PostCard: React.FC<PostCardProps> = ({
               onClick={() => onSave(post.id)}
               className={`p-1.5 transition-all duration-200 ${
                 isSaved 
-                  ? 'text-cyan-500 scale-110' 
-                  : 'text-cyan-600/70 hover:text-cyan-700'
+                  ? 'text-emerald-400 scale-110 bg-emerald-900/20 rounded-full' 
+                  : 'text-gray-400 hover:text-emerald-400 hover:bg-gray-800/50 rounded-full'
               }`}
             >
               <Bookmark className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
@@ -509,29 +640,41 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
 
-        {/* Likes Count */}
-        <div className="">
-          <p className="font-semibold text-cyan-900 text-sm">
-            {Math.floor(Math.random() * 50)} likes
-          </p>
+        {/* Engagement Stats */}
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <p className="font-bold text-white text-sm">
+              {Math.floor(Math.random() * 150) + 50} likes
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 text-gray-400 text-xs">
+              <MessageCircle className="h-3 w-3" />
+              <span>{Math.floor(Math.random() * 25)}</span>
+            </div>
+            <div className="flex items-center gap-1 text-gray-400 text-xs">
+              <Share className="h-3 w-3" />
+              <span>{Math.floor(Math.random() * 15)}</span>
+            </div>
+          </div>
         </div>
 
         {/* Comments */}
-        <div className="text-cyan-600/70 text-sm ">
-          <button className="hover:text-cyan-700 transition-colors">
-            View {Math.floor(Math.random() * 15)} comments
+        <div className="text-gray-400 text-sm mb-3">
+          <button className="hover:text-emerald-400 transition-colors font-medium">
+            View all {Math.floor(Math.random() * 25)} comments
           </button>
         </div>
 
         {/* Add Comment */}
-        <div className="pt-3 border-t border-cyan-100/50 hidden">
+        <div className="pt-3 border-t border-emerald-800/30">
           <div className="flex gap-3">
             <input
               type="text"
-              placeholder="Add comment..."
-              className="flex-1 text-sm text-cyan-900 bg-transparent border-none outline-none placeholder-cyan-600/40"
+              placeholder="Add a betting tip or comment..."
+              className="flex-1 text-sm text-white bg-gray-800/30 border border-emerald-800/50 rounded-lg px-3 py-2 outline-none placeholder-gray-500 focus:border-emerald-700 transition-colors"
             />
-            <button className="text-cyan-500 hover:text-cyan-600 font-semibold text-sm transition-colors">
+            <button className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold text-sm px-4 py-2 rounded-lg transition-all duration-200 shadow-md">
               Post
             </button>
           </div>
